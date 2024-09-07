@@ -1,0 +1,35 @@
+services:
+  mysql:
+    container_name: cf_mysql
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: hathienlon
+    volumes:
+      - mysql:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      - coffee-shop
+    restart: always
+
+  phpmyadmin:
+    container_name: cf_phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: cf_mysql
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 500M
+    ports:
+      - 8100:80
+    networks:
+      - coffee-shop
+    restart: unless-stopped
+
+
+networks:
+  coffee-shop:
+    driver: bridge
+
+volumes:
+  mysql:
+  phpmyadmin:
