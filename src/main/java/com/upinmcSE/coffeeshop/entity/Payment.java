@@ -1,6 +1,5 @@
 package com.upinmcSE.coffeeshop.entity;
 
-import com.upinmcSE.coffeeshop.enums.PaymentType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +15,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    PaymentType paymentType;
+    String paymentType;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
