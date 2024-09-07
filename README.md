@@ -6,5 +6,7 @@
 - Design : Figma
 - Frontend : ReactJS
 - Backend : Java (Framework : Spring-boot-3)
+- Database : Mysql
+- CI/CD : Docker
 
 
