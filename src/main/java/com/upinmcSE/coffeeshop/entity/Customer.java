@@ -1,16 +1,13 @@
 package com.upinmcSE.coffeeshop.entity;
 
-import com.upinmcSE.coffeeshop.enums.MenberLV;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Setter
 @Getter
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -19,6 +16,10 @@ public class Customer extends User{
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    MenberLV menberLV;
+    @ManyToOne
+    @JoinColumn(name = "member_lv_id")
+    MemberLv memberLv;
+
     Integer point;
+
 }

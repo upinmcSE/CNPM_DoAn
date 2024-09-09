@@ -10,7 +10,7 @@ services:
       - 3306:3306
     networks:
       - coffee-shop
-    restart: always
+    restart: unless-stopped
 
   phpmyadmin:
     container_name: cf_phpmyadmin

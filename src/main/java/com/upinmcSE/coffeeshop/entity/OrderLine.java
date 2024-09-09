@@ -15,14 +15,13 @@ public class OrderLine {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    Integer amount;
-
-
     @OneToOne
     @JoinColumn(name = "product_id", nullable = false)
     Product product;
 
+    Integer amount;
+
     @ManyToOne
-    @JoinColumn(name = "order_id", nullable = false)
+    @JoinColumn(name = "order_id")
     Order order;
 }

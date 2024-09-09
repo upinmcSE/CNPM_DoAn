@@ -1,17 +1,13 @@
 package com.upinmcSE.coffeeshop.entity;
 
-import com.upinmcSE.coffeeshop.enums.EmployeeLV;
-import com.upinmcSE.coffeeshop.enums.WorkTime;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Setter
 @Getter
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -20,7 +16,13 @@ public class Employee extends User {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    EmployeeLV employeeLV;
+    @ManyToOne
+    @JoinColumn(name = "employee_lv_id")
+    EmployeeLv employeeLv;
+
     double salary;
+
+    @ManyToOne
+    @JoinColumn(name = "work_time_id")
     WorkTime workTime;
 }

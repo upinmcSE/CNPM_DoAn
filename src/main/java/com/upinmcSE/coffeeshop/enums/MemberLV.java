@@ -1,6 +1,6 @@
 package com.upinmcSE.coffeeshop.enums;
 
-public enum MenberLV {
-    MENBER,
+public enum MemberLV {
+    MEMBER,
     VIP
 }

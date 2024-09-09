@@ -1,8 +1,11 @@
 package com.upinmcSE.coffeeshop.entity;
 
-import com.upinmcSE.coffeeshop.enums.OrderType;
+
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,14 +18,14 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "orders")
+@EntityListeners(AuditingEntityListener.class)
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    double totalPrice;
-    LocalDate createdDate;
-    LocalDate modifiedDate;
+    @OneToOne
+    @JoinColumn(name="order_type_id")
     OrderType orderType;
 
     @ManyToOne
@@ -35,5 +38,14 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     List<OrderLine> orderLines;
+
+    double totalPrice;
+
+    @CreatedDate
+    LocalDate createdDate;
+
+    @LastModifiedDate
+    LocalDate modifiedDate;
+
 
 }
