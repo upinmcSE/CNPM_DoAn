@@ -1,0 +1,2 @@
+Customer: Nguyen Van A, Product: Cà phê sữa, Amount: 1, Date: 2024-09-16
+Customer: Nguyen Van A, Product: Đen Đá, Amount: 3, Date: 2024-09-16

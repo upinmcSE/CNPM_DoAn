@@ -3,10 +3,10 @@
 ## Đề tài: Xây dựng ứng dụng bán đồ uống
 
 ## Công nghệ sử dụng
+
 - Design : Figma
 - Frontend : ReactJS
 - Backend : Java (Framework : Spring-boot-3)
 - Database : Mysql
+- Testing : Mockito
 - CI/CD : Docker
-
-
