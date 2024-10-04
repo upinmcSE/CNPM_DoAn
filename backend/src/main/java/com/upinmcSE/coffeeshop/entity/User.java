@@ -26,6 +26,7 @@ public class User {
     String username;
     String password;
     String fullName;
+    String email;
     Integer age;
     boolean gender;
     @CreatedDate

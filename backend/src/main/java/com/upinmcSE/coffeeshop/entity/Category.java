@@ -18,7 +18,7 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    String categoryName;
+    String name;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Product> products;

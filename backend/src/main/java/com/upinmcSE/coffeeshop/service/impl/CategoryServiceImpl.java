@@ -3,6 +3,8 @@ package com.upinmcSE.coffeeshop.service.impl;
 import com.upinmcSE.coffeeshop.dto.request.CategoryRequest;
 import com.upinmcSE.coffeeshop.dto.response.CategoryResponse;
 import com.upinmcSE.coffeeshop.entity.Category;
+import com.upinmcSE.coffeeshop.exception.ErrorCode;
+import com.upinmcSE.coffeeshop.exception.ErrorException;
 import com.upinmcSE.coffeeshop.repository.CategoryRepository;
 import com.upinmcSE.coffeeshop.service.CategoryService;
 import lombok.AccessLevel;
@@ -17,8 +19,10 @@ public class CategoryServiceImpl implements CategoryService {
     CategoryRepository categoryRepository;
     @Override
     public String add(CategoryRequest request) {
+        if(categoryRepository.existsByName(request.categoryName()))
+            throw new ErrorException(ErrorCode.CATEGORY_EXISTED);
         Category category = Category.builder()
-                .categoryName(request.categoryName())
+                .name(request.categoryName())
                 .build();
         return categoryRepository.save(category).getId();
     }

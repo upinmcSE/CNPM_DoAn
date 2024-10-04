@@ -5,6 +5,7 @@ public record CustomerRequest(
         String password,
         String rePassword,
         String fullName,
+        String email,
         Integer age,
         boolean gender
 ) {

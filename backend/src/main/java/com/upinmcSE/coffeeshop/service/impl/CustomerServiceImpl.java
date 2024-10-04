@@ -5,6 +5,8 @@ import com.upinmcSE.coffeeshop.dto.response.CustomerResponse;
 import com.upinmcSE.coffeeshop.entity.MemberLv;
 import com.upinmcSE.coffeeshop.enums.MemberLV;
 import com.upinmcSE.coffeeshop.enums.RoleType;
+import com.upinmcSE.coffeeshop.exception.ErrorCode;
+import com.upinmcSE.coffeeshop.exception.ErrorException;
 import com.upinmcSE.coffeeshop.mapper.CustomerMapper;
 import com.upinmcSE.coffeeshop.repository.CustomerRepository;
 import com.upinmcSE.coffeeshop.repository.MemberLVRepository;
@@ -30,17 +32,17 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerResponse add(CustomerRequest request) {
         if(customerRepository.existsByUsername(request.username()))
-            throw new RuntimeException("Customer existed");
+            throw new ErrorException(ErrorCode.USER_EXISTED);
 
         if(!(request.password().equals(request.rePassword())))
-            throw new RuntimeException("password not match");
+            throw new ErrorException(ErrorCode.NOT_MATCH_PW);
 
         var customer = customerMapper.toCustomer(request);
 
         customer.setPassword(passwordEncoder.encode(request.password()));
 
         var role = roleRepository.findByName(String.valueOf(RoleType.CUSTOMER)).orElseThrow(
-                () -> new RuntimeException("Not found") );
+                () -> new ErrorException(ErrorCode.NOT_FOUND_ROLE));
         customer.setRole(role);
 
         MemberLv memberLv = memberLVRepository.findByName("MEMBER");

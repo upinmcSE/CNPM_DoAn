@@ -1,6 +1,7 @@
 package com.upinmcSE.coffeeshop.controller;
 
 import com.upinmcSE.coffeeshop.dto.request.ProductRequest;
+import com.upinmcSE.coffeeshop.dto.response.PageResponse;
 import com.upinmcSE.coffeeshop.dto.response.ProductResponse;
 import com.upinmcSE.coffeeshop.service.impl.ProductServiceImpl;
 import lombok.AccessLevel;
@@ -27,5 +28,22 @@ public class ProductController {
             @RequestParam("file") MultipartFile file
     ) throws IOException {
         return ResponseEntity.ok().body(productService.add(request, file));
+    }
+    @GetMapping("/getall")
+    public ResponseEntity<PageResponse<ProductResponse>> getProducts(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size
+
+    ){
+        return ResponseEntity.ok().body(productService.getOutstandingProduct(page, size));
+    }
+
+    @GetMapping("/getall-by-category")
+    public ResponseEntity<PageResponse<ProductResponse>> getProductByCategory(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size,
+            @RequestParam(value = "category") String category
+    ){
+        return ResponseEntity.ok().body(productService.getCategoryProduct(page, size, category));
     }
 }

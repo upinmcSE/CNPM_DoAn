@@ -29,19 +29,19 @@ public class OrderActivityLogger {
         OrderResponse orderResponse = (OrderResponse) response.getBody();
 
         // Extract necessary information
-        String customerName = orderResponse.customerName();
+        String customerId = orderResponse.id();
         LocalDate createdDate = orderResponse.createdDate();
 
         // Log each order line
         for (OrderLineResponse orderLine : orderResponse.orderLines()) {
-            String productName = orderLine.productName();
+            String productId = orderLine.id();
             int amount = orderLine.amount();
 
             // Log the information
-            log.info("Customer: {}, Product: {}, Amount: {}, Date: {}", customerName, productName, amount, createdDate);
+            log.info("Customer: {}, Product: {}, Amount: {}, Date: {}", customerId, productId, amount, createdDate);
 
             // Write the information to a file
-            writeOrderInfoToFile(customerName, productName, amount, createdDate);
+            writeOrderInfoToFile(customerId, productId, amount, createdDate);
         }
     }
 

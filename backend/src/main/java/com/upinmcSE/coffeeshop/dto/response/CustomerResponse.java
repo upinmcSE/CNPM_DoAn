@@ -9,6 +9,7 @@ public record CustomerResponse(
         String id,
         String username,
         String fullName,
+        String email,
         Integer age,
         boolean gender,
         String menberLV,

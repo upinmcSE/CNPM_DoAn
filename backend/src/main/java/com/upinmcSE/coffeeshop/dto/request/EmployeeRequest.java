@@ -5,6 +5,7 @@ public record EmployeeRequest(
         String password,
         String rePassword,
         String fullName,
+        String email,
         Integer age,
         boolean gender,
         String employeeLv,

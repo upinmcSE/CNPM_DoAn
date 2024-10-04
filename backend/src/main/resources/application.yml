@@ -15,3 +15,41 @@ spring:
       ddl-auto: update
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
+
+
+jwt:
+  signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
+
+payment: ##Configuration for development environment
+  vnPay:
+    url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+    returnUrl: http://localhost:8081/coffee/api/v1/payment/vn-pay-callback
+    tmnCode: "G34AWAZ1"
+    secretKey: "6EEJXN2NWFRHE3QKBLNLZNPOWST5I0FD"
+    version: "2.1.0"
+    command: "pay"
+    orderType: "other"
+
+momo:
+  partnerCode: "mTCKt9W3eU1m39TW"
+  accessKey: "mTCKt9W3eU1m39TW"
+  secretKey: "SetA5RDnLHvt51AULf51DyauxUo3kDU6"
+  endpoint: https://test-payment.momo.vn/v2/gateway/api
+
+
+
+# config for development
+DEV_MOMO_ENDPOINT: https://test-payment.momo.vn/v2/gateway/api
+DEV_ACCESS_KEY: "mTCKt9W3eU1m39TW"
+DEV_PARTNER_CODE: "MOMOLRJZ20181206"
+DEV_SECRET_KEY: "SetA5RDnLHvt51AULf51DyauxUo3kDU6"
+
+## AIOv2
+CREATE_URL: /create
+QUERY_URL: /query
+REFUND_URL: /refund
+CONFIRM_URL: /confirm
+TOKEN_PAY_URL: /tokenization/pay
+TOKEN_BIND_URL: /tokenization/bind
+TOKEN_INQUIRY_URL: /tokenization/cbQuery
+TOKEN_DELETE_URL: /tokenization/delete

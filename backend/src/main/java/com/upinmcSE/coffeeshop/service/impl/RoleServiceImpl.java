@@ -3,6 +3,8 @@ package com.upinmcSE.coffeeshop.service.impl;
 import com.upinmcSE.coffeeshop.dto.request.RoleRequest;
 import com.upinmcSE.coffeeshop.dto.response.RoleResponse;
 import com.upinmcSE.coffeeshop.entity.Role;
+import com.upinmcSE.coffeeshop.exception.ErrorCode;
+import com.upinmcSE.coffeeshop.exception.ErrorException;
 import com.upinmcSE.coffeeshop.mapper.RoleMapper;
 import com.upinmcSE.coffeeshop.repository.PermissionRepository;
 import com.upinmcSE.coffeeshop.repository.RoleRepository;
@@ -25,8 +27,12 @@ public class RoleServiceImpl implements RoleService {
     RoleRepository roleRepository;
     PermissionRepository permissionRepository;
     RoleMapper roleMapper;
+
     @Override
     public RoleResponse add(RoleRequest request) {
+        if(roleRepository.existsByName(request.name()))
+            throw new ErrorException(ErrorCode.ROLE_EXISTED);
+
         Role role = roleMapper.toRole(request);
 
         var permission = permissionRepository.findAllByName(request.permissions());

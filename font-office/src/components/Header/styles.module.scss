@@ -1,0 +1,50 @@
+@import '@styles/mixin.module.scss';
+.container {
+    @include flex_box_custom(center, center, 10px);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.containerHeader {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #B3B3B3;
+    height: 85px;
+}
+
+.containerBox {
+    @include flex_box_custom(center, center, 20px);
+}
+
+.containerBoxIcon {
+    @include flex_box_custom(center, center, 40px);
+    margin-right: 20px
+}
+
+.containerMenu {
+    @include flex_box_custom(center, center, 40px);
+}
+
+.menu {
+    cursor: pointer;
+    padding-top: 8px;
+    font-size: 20px;
+}
+
+.menu::after {
+    content: '';
+    display: block;
+    height: 3px;
+    background-color: #333;
+    margin-top: 6px;
+    transform: scale(0);
+    transition: transform 300ms;
+}
+
+.menu:hover::after {
+    transform: scale(1);
+}

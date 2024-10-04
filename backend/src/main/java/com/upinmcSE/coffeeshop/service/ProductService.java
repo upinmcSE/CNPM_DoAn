@@ -14,7 +14,7 @@ public interface ProductService {
     ProductResponse update(String id, ProductRequest request);
 
     PageResponse<ProductResponse> getOutstandingProduct(int page, int size);
-    PageResponse<ProductResponse> getCategoryProduct(int page, int size);
+    PageResponse<ProductResponse> getCategoryProduct(int page, int size, String category);
     ProductResponse getRecommemdProduct();
     
     void delete(String id);

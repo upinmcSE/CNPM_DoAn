@@ -6,14 +6,20 @@ import com.upinmcSE.coffeeshop.dto.response.ProductResponse;
 import com.upinmcSE.coffeeshop.entity.Category;
 import com.upinmcSE.coffeeshop.entity.Product;
 import com.upinmcSE.coffeeshop.entity.ProductImage;
+import com.upinmcSE.coffeeshop.exception.ErrorCode;
+import com.upinmcSE.coffeeshop.exception.ErrorException;
 import com.upinmcSE.coffeeshop.mapper.ProductMapper;
 import com.upinmcSE.coffeeshop.repository.CategoryRepository;
+import com.upinmcSE.coffeeshop.repository.OrderLineRepository;
 import com.upinmcSE.coffeeshop.repository.ProductImageRepository;
 import com.upinmcSE.coffeeshop.repository.ProductRepository;
 import com.upinmcSE.coffeeshop.service.ProductService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,11 +40,17 @@ public class ProductServiceImpl implements ProductService {
     ProductRepository productRepository;
     ProductMapper productMapper;
     ProductImageRepository productImageRepository;
+    OrderLineRepository orderLineRepository;
 
     @Override
     public ProductResponse add(ProductRequest request, MultipartFile file) throws IOException {
         // Tìm loại sản phẩm
-        Category category = categoryRepository.findByCategoryName(request.category());
+        Category category = categoryRepository.findByName(request.category()).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CATEGORY)
+        );
+        // kiểm tra sản phẩm đã tồn tại chưa
+        if(productRepository.existsByName(request.name()))
+            throw new ErrorException(ErrorCode.PRODUCT_EXISTED);
 
         // tạo 1 đối tượng product
         Product product = Product.builder()
@@ -64,13 +76,35 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PageResponse<ProductResponse> getOutstandingProduct(int page, int size) {
-        return null;
+    public PageResponse<ProductResponse> getOutstandingProduct(int page, int pageSize) {
+//        Sort sort = Sort.by("price").descending();
+
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        var pageData = orderLineRepository.findTopProductsByTotalAmount(pageable);
+
+        return PageResponse.<ProductResponse>builder()
+                .currentPage(page)
+                .pageSize(pageData.getSize())
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream().map(productMapper::toProductResponse).toList())
+                .build();
     }
 
     @Override
-    public PageResponse<ProductResponse> getCategoryProduct(int page, int size) {
-        return null;
+    public PageResponse<ProductResponse> getCategoryProduct(int page, int pageSize, String category) {
+        Sort sort = Sort.by("price").descending();
+
+        Pageable pageable = PageRequest.of(page - 1, pageSize, sort);
+        var pageData = productRepository.findAllByCategory_Name(category, pageable);
+
+        return PageResponse.<ProductResponse>builder()
+                .currentPage(page)
+                .pageSize(pageData.getSize())
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream().map(productMapper::toProductResponse).toList())
+                .build();
     }
 
     @Override
@@ -86,22 +120,22 @@ public class ProductServiceImpl implements ProductService {
     private ProductImage createProductImage(String productId, MultipartFile file) throws IOException {
         // Tìm product theo productId
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_PRODUCT));
 
         // Kiểm tra file ảnh có rỗng không
         if (file.isEmpty()) {
-            throw new RuntimeException("File is empty");
+            throw new ErrorException(ErrorCode.FILE_EMPTY);
         }
 
         // Kiểm tra kích thước file và định dạng
         if (file.getSize() > 10 * 1024 * 1024) { // Kích thước > 10MB
-            throw new RuntimeException("File size is too large");
+            throw new ErrorException(ErrorCode.FILE_LARGE);
         }
 
         // Kiểm tra xem có phải file ảnh không
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
-            throw new RuntimeException("Invalid file type, only image files are accepted");
+            throw new ErrorException(ErrorCode.INVALID_IMAGE);
         }
 
         // Lưu file vào hệ thống và lấy tên file

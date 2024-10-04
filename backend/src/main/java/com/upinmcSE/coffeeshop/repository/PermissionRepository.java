@@ -13,6 +13,9 @@ import java.util.Set;
 
 @Repository
 public interface PermissionRepository extends JpaRepository<Permission, String> {
+
+    boolean existsByName(String name);
+
     @Query("SELECT p FROM Permission p WHERE p.name IN :permissions")
     List<Permission> findAllByName(@Param("permissions") Collection<String> permissions);
 }

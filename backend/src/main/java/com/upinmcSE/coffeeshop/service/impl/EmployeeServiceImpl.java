@@ -7,6 +7,8 @@ import com.upinmcSE.coffeeshop.entity.EmployeeLv;
 import com.upinmcSE.coffeeshop.entity.Role;
 import com.upinmcSE.coffeeshop.entity.WorkTime;
 import com.upinmcSE.coffeeshop.enums.RoleType;
+import com.upinmcSE.coffeeshop.exception.ErrorCode;
+import com.upinmcSE.coffeeshop.exception.ErrorException;
 import com.upinmcSE.coffeeshop.mapper.EmployeeMapper;
 import com.upinmcSE.coffeeshop.repository.EmployeeLVRepository;
 import com.upinmcSE.coffeeshop.repository.EmployeeRepository;
@@ -34,24 +36,24 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public EmployeeResponse add(EmployeeRequest request) {
         if(employeeRepository.existsByUsername(request.username()))
-            throw new RuntimeException("Employee existed");
+            throw new ErrorException(ErrorCode.USER_EXISTED);
 
         if(!(request.password().equals(request.rePassword())))
-            throw new RuntimeException("password not match");
+            throw new ErrorException(ErrorCode.NOT_MATCH_PW);
 
         Employee employee = employeeMapper.toEmployee(request);
         employee.setPassword(passwordEncoder.encode(request.password()));
 
         Role role = roleRepository.findByName(String.valueOf(RoleType.EMPLOYEE)).orElseThrow(
-                () -> new RuntimeException("Not found role"));
+                () -> new ErrorException(ErrorCode.NOT_FOUND_ROLE));
         employee.setRole(role);
 
         EmployeeLv employeeLv = employeeLVRepository.findByName(request.employeeLv()).orElseThrow(
-                () -> new RuntimeException("Not found employee lv"));
+                () -> new ErrorException(ErrorCode.EMPLOY_LV));
         employee.setEmployeeLv(employeeLv);
 
         WorkTime workTime = workTimeRepository.findByName(request.workTime()).orElseThrow(
-                () -> new RuntimeException("Not found work time"));
+                () -> new ErrorException(ErrorCode.WORK_TIME));
         employee.setWorkTime(workTime);
 
         employee.setWorkingDays(0);

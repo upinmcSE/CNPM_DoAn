@@ -11,6 +11,7 @@ public class CustomerMapper {
         return Customer.builder()
                 .username(request.username())
                 .fullName(request.fullName())
+                .email(request.email())
                 .age(request.age())
                 .gender(request.gender())
                 .build();
@@ -21,6 +22,7 @@ public class CustomerMapper {
                 .id(customer.getId())
                 .username(customer.getUsername())
                 .fullName(customer.getFullName())
+                .email(customer.getEmail())
                 .age(customer.getAge())
                 .gender(customer.isGender())
                 .menberLV(customer.getMemberLv().getName())

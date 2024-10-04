@@ -3,6 +3,8 @@ package com.upinmcSE.coffeeshop.service.impl;
 import com.upinmcSE.coffeeshop.dto.request.PermissionRequest;
 import com.upinmcSE.coffeeshop.dto.response.PermissionResponse;
 import com.upinmcSE.coffeeshop.entity.Permission;
+import com.upinmcSE.coffeeshop.exception.ErrorCode;
+import com.upinmcSE.coffeeshop.exception.ErrorException;
 import com.upinmcSE.coffeeshop.mapper.PermissionMapper;
 import com.upinmcSE.coffeeshop.repository.PermissionRepository;
 import com.upinmcSE.coffeeshop.service.PermissionService;
@@ -23,6 +25,8 @@ public class PermissionServiceImpl implements PermissionService {
     PermissionMapper permissionMapper;
     @Override
     public PermissionResponse add(PermissionRequest request) {
+        if(permissionRepository.existsByName(request.name()))
+            throw new ErrorException(ErrorCode.PERRMISSION_EXISTED);
         var permission = permissionMapper.toPermission(request);
 
         permission = permissionRepository.save(permission);
@@ -32,7 +36,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public PermissionResponse update(String id, PermissionRequest request) {
         Permission permission = permissionRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("not found"));
+                () -> new ErrorException(ErrorCode.NOT_FOUND_PERMISSION));
 
         permission.setName(request.name());
         permission.setDescription(request.description());

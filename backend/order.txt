@@ -1,2 +1,5 @@
-Customer: Nguyen Van A, Product: Cà phê sữa, Amount: 1, Date: 2024-09-16
-Customer: Nguyen Van A, Product: Đen Đá, Amount: 3, Date: 2024-09-16
+
+Customer: dc278c99-b3f4-4cc4-af4d-9e96f1f102c4, Product: 1c1ccf64-238f-4e85-b27d-e85607d6621c, Amount: 3, Date: 2024-10-01
+Customer: dc278c99-b3f4-4cc4-af4d-9e96f1f102c4, Product: 6121af92-7cc5-4d08-ab8f-b389ce777444, Amount: 5, Date: 2024-10-01
+Customer: 637ad6bf-5209-478c-946e-4fd3afa41fd7, Product: 1c1ccf64-238f-4e85-b27d-e85607d6621c, Amount: 3, Date: 2024-10-01
+Customer: 637ad6bf-5209-478c-946e-4fd3afa41fd7, Product: 6121af92-7cc5-4d08-ab8f-b389ce777444, Amount: 5, Date: 2024-10-01
