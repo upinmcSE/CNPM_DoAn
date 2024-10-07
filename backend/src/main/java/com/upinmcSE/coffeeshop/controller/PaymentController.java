@@ -4,28 +4,30 @@ import com.upinmcSE.coffeeshop.dto.response.PaymentResponse;
 import com.upinmcSE.coffeeshop.dto.response.ResponseObject;
 import com.upinmcSE.coffeeshop.dto.response.SuccessResponse;
 import com.upinmcSE.coffeeshop.dto.response.VNPayResponse;
-import com.upinmcSE.coffeeshop.dto.response.momo.PaymentMoMoResponse;
-import com.upinmcSE.coffeeshop.exception.MoMoException;
 import com.upinmcSE.coffeeshop.service.impl.PaymentServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/payment")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentController {
+    RestTemplate restTemplate = new RestTemplate();
     PaymentServiceImpl paymentService;
 
     @GetMapping("/vn-pay")
     public SuccessResponse<PaymentResponse> pay(HttpServletRequest request){
         return SuccessResponse.<PaymentResponse>builder()
                 .message("Payment successfully !!")
-                .result(paymentService.createPayment(request))
+                .result(paymentService.createPaymentVNPAY(request))
                 .build();
     }
 
@@ -40,17 +42,74 @@ public class PaymentController {
     }
 
     @PostMapping("/momo")
-    public SuccessResponse<PaymentMoMoResponse> payMoMO(HttpServletRequest request) throws MoMoException {
-        return SuccessResponse.<PaymentMoMoResponse>builder()
-                .message("Payment successfully !!")
-                .result(paymentService.createMoMoPayment(request))
-                .build();
+    public ResponseEntity<?> createPayment() {
+        try {
+
+            String orderId = "dc278c99-b3f4-4cc4-af4d-9e96f1f102c4";
+
+            // Tạo request body cho MoMo
+            Map<String, Object> requestBody = paymentService.createPaymentMOMO(orderId);
+
+            // Gửi request tới MoMo API
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Type", "application/json");
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    "https://test-payment.momo.vn/v2/gateway/api/create",
+                    HttpMethod.POST,
+                    entity,
+                    String.class
+            );
+
+            return ResponseEntity.ok(response.getBody());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
+        }
     }
 
-    @PostMapping("/momo-callback")
-    public ResponseObject<String> momoCallbackHandler(HttpServletRequest request){
-        return new ResponseObject<>(HttpStatus.OK,"ahihi",null);
+
+    @PostMapping("/callback")
+    public ResponseEntity<?> callback(@RequestBody Map<String, Object> requestBody) {
+        System.out.println("Callback data: " + requestBody);
+        return ResponseEntity.status(204).body(requestBody);
     }
+
+//    @PostMapping("/check-status-transaction")
+//    public ResponseEntity<?> checkTransactionStatus(@RequestBody Map<String, String> requestBody) {
+//        String orderId = requestBody.get("orderId");
+//
+//        try {
+//            String rawSignature = "accessKey=" + config.accessKey +
+//                    "&orderId=" + orderId +
+//                    "&partnerCode=" + config.partnerCode +
+//                    "&requestId=" + orderId;
+//
+//            String signature = hmacSHA256(config.secretKey, rawSignature);
+//
+//            Map<String, Object> queryRequestBody = new HashMap<>();
+//            queryRequestBody.put("partnerCode", config.partnerCode);
+//            queryRequestBody.put("requestId", orderId);
+//            queryRequestBody.put("orderId", orderId);
+//            queryRequestBody.put("signature", signature);
+//            queryRequestBody.put("lang", config.lang);
+//
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.add("Content-Type", "application/json");
+//
+//            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(queryRequestBody, headers);
+//            ResponseEntity<String> response = restTemplate.exchange(
+//                    "https://test-payment.momo.vn/v2/gateway/api/query",
+//                    HttpMethod.POST,
+//                    entity,
+//                    String.class
+//            );
+//
+//            return ResponseEntity.ok(response.getBody());
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body("Error: " + e.getMessage());
+//        }
+//    }
 
 
 }

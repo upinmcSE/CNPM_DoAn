@@ -17,14 +17,7 @@ public class Payment {
 
     String paymentType;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    Customer customer;
-
-    @ManyToOne
-    @JoinColumn(name = "employee_id")
-    Employee employee;
-
     @OneToOne
     @JoinColumn(name = "order_id" ,nullable = false)
-    Order order;}
+    Order order;
+}

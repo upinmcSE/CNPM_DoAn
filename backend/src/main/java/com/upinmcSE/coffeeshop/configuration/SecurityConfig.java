@@ -21,7 +21,8 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {
         "/api/v1/authentication/customer-login", "/api/v1/products/getall",
-            "/api/v1/products/getall-by-category"
+            "/api/v1/products/getall-by-category",
+            "/api/v1/payment/callback"
     };
 
     @Autowired

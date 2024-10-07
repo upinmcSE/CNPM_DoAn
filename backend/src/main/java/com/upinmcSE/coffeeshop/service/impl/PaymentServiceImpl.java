@@ -1,23 +1,19 @@
 package com.upinmcSE.coffeeshop.service.impl;
 
-import com.upinmcSE.coffeeshop.configuration.momopay.CustomEnvironment;
+import com.upinmcSE.coffeeshop.configuration.momo.MoMoConfig;
 import com.upinmcSE.coffeeshop.configuration.vnpay.VNPAYConfig;
 import com.upinmcSE.coffeeshop.dto.response.PaymentResponse;
-import com.upinmcSE.coffeeshop.dto.response.momo.PaymentMoMoResponse;
 import com.upinmcSE.coffeeshop.entity.Order;
-import com.upinmcSE.coffeeshop.enums.momo.RequestType;
 import com.upinmcSE.coffeeshop.exception.ErrorCode;
 import com.upinmcSE.coffeeshop.exception.ErrorException;
-import com.upinmcSE.coffeeshop.exception.MoMoException;
 import com.upinmcSE.coffeeshop.repository.OrderRepository;
 import com.upinmcSE.coffeeshop.service.PaymentService;
-import com.upinmcSE.coffeeshop.service.momo.CreateOrderMoMo;
-import com.upinmcSE.coffeeshop.utils.momopay.LogUtils;
 import com.upinmcSE.coffeeshop.utils.vnpay.VNPayUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -29,9 +25,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     OrderRepository orderRepository;
     VNPAYConfig vnpayConfig;
-    CreateOrderMoMo createOrderMoMo;
+    MoMoConfig moMoConfig;
     @Override
-    public PaymentResponse createPayment(HttpServletRequest request) {
+    public PaymentResponse createPaymentVNPAY(HttpServletRequest request) {
         Order order = orderRepository.findById(request.getParameter("orderId")).orElseThrow(
                 () -> new ErrorException(ErrorCode.NOT_FOUND_ORDER)
         );
@@ -60,30 +56,15 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentMoMoResponse createMoMoPayment(HttpServletRequest request) throws MoMoException {
-        Order order = orderRepository.findById(request.getParameter("orderId")).orElseThrow(
+    public Map<String, Object> createPaymentMOMO(String orderId) throws Exception {
+        Order order = orderRepository.findById(orderId).orElseThrow(
                 () -> new ErrorException(ErrorCode.NOT_FOUND_ORDER));
-        String orderId = order.getId();
-        LogUtils.init();
-        String requestId = String.valueOf(System.currentTimeMillis());
-        long amount = Math.round(order.getTotalPrice());
+        String amount = String.valueOf(Math.round(order.getTotalPrice()));
+        System.out.println(amount);
 
-        String payUrl = "https://momo.vn/payment?orderId="+orderId; // Link thanh toán từ MoMo
-        String shortLink = "https://momo.vn/s/"+orderId;
-        String deeplink = "momo://payment?orderId="+orderId;
+        return moMoConfig.getMoMoConfig(orderId, amount);
 
-        String partnerClientId = "partnerClientId";
-        String orderInfo = "Pay With MoMo";
-        String returnUrl = "http://localhost:8081/coffee/api/v1/payment/momo-callback";
-        String notifyUrl = "https://google.com.vn";
-
-        CustomEnvironment environment = CustomEnvironment.selectEnv("dev");
-        PaymentMoMoResponse captureWalletMoMoResponse = createOrderMoMo.process(environment, order.getId(), requestId,
-                Long.toString(amount), orderInfo, returnUrl, notifyUrl,"", RequestType.PAY_WITH_ATM, Boolean.TRUE);
-
-        return captureWalletMoMoResponse;
     }
-
 
 
 }

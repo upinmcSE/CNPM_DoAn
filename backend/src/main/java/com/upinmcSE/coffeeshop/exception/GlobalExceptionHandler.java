@@ -1,7 +1,6 @@
 package com.upinmcSE.coffeeshop.exception;
 
 import com.upinmcSE.coffeeshop.dto.response.SuccessResponse;
-import jdk.jshell.EvalException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,15 +30,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(errorCode.getStatusCode()).body(successResponse);
     }
 
-    // Xử lý lỗi từ MoMo
-    @ExceptionHandler(value = MoMoException.class)
-    ResponseEntity<SuccessResponse> handlingMoMoException(MoMoException exception){
-        SuccessResponse successResponse = new SuccessResponse<>();
 
-        successResponse.setCode(ErrorCode.MOMO_EXCEPTION.getCode());
-        successResponse.setMessage(ErrorCode.MOMO_EXCEPTION.getMessage());
-        return ResponseEntity.badRequest().body(successResponse);
-    }
 
     // Xử lý lỗi không có quyền truy cập
 
