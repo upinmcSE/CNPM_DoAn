@@ -2,6 +2,7 @@ package com.upinmcSE.coffeeshop.controller;
 
 import com.upinmcSE.coffeeshop.dto.request.PermissionRequest;
 import com.upinmcSE.coffeeshop.dto.response.PermissionResponse;
+import com.upinmcSE.coffeeshop.dto.response.SuccessResponse;
 import com.upinmcSE.coffeeshop.service.impl.PermissionServiceImpl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,19 @@ public class PermissionController {
     @GetMapping("/get-all")
     public ResponseEntity<List<PermissionResponse>> getAll(){
         return ResponseEntity.ok().body(permissionService.getAll());
+    }
+
+    @PutMapping("update/{id}")
+    public ResponseEntity<PermissionResponse> update(@RequestParam("id") String id, @RequestBody PermissionRequest request){
+        return ResponseEntity.ok().body(permissionService.update(id, request));
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public SuccessResponse<?> delete(@RequestParam("id") String id){
+        permissionService.delete(id);
+        return SuccessResponse.builder()
+                .message("Delete permission successfully")
+                .build();
     }
 
 }

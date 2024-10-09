@@ -42,6 +42,8 @@ public class ProductServiceImpl implements ProductService {
     ProductImageRepository productImageRepository;
     OrderLineRepository orderLineRepository;
 
+
+
     @Override
     public ProductResponse add(ProductRequest request, MultipartFile file) throws IOException {
         // Tìm loại sản phẩm
@@ -69,10 +71,35 @@ public class ProductServiceImpl implements ProductService {
         product.setProductImages(productImage);
         return productMapper.toProductResponse(product);
     }
+    @Override
+    public ProductResponse updateImage(String productId,  MultipartFile file) throws IOException {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_PRODUCT));
+
+        ProductImage oldImage = product.getProductImages();
+        if (oldImage != null) {
+            productImageRepository.delete(oldImage);
+        }
+
+        ProductImage productImage = createProductImage(productId, file);
+        product.setProductImages(productImage);
+
+        return productMapper.toProductResponse(product);
+    }
 
     @Override
-    public ProductResponse update(String id, ProductRequest request) {
-        return null;
+    public ProductResponse updateInfo(String id, ProductRequest request) {
+        var product = productRepository.findById(id).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_PRODUCT));
+        product.setName(request.name());
+        product.setPrice(request.price());
+        product.setDescription(request.description());
+
+        Category category = categoryRepository.findByName(request.category()).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CATEGORY));
+        product.setCategory(category);
+
+        return productMapper.toProductResponse(productRepository.saveAndFlush(product));
     }
 
     @Override
@@ -108,7 +135,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse getRecommemdProduct() {
+    public ProductResponse getRecommemdProduct(String customerId) {
         return null;
     }
 

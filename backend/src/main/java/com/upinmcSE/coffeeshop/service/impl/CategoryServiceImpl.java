@@ -5,6 +5,7 @@ import com.upinmcSE.coffeeshop.dto.response.CategoryResponse;
 import com.upinmcSE.coffeeshop.entity.Category;
 import com.upinmcSE.coffeeshop.exception.ErrorCode;
 import com.upinmcSE.coffeeshop.exception.ErrorException;
+import com.upinmcSE.coffeeshop.mapper.CategoryMapper;
 import com.upinmcSE.coffeeshop.repository.CategoryRepository;
 import com.upinmcSE.coffeeshop.service.CategoryService;
 import lombok.AccessLevel;
@@ -12,11 +13,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CategoryServiceImpl implements CategoryService {
     CategoryRepository categoryRepository;
+    CategoryMapper categoryMapper;
     @Override
     public String add(CategoryRequest request) {
         if(categoryRepository.existsByName(request.categoryName()))
@@ -28,17 +32,26 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public String update(String id, CategoryRequest request) {
-        return null;
+    public CategoryResponse update(String id, CategoryRequest request) {
+        var category = categoryRepository.findById(id).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CATEGORY));
+        category.setName(request.categoryName());
+        return categoryMapper.toCategoryRespose(category);
     }
 
     @Override
-    public CategoryResponse getAll() {
-        return null;
+    public List<CategoryResponse> getAll() {
+        return categoryRepository.findAll()
+                .stream().map(categoryMapper::toCategoryRespose)
+                .toList();
     }
 
     @Override
     public void delete(String id) {
+        var category = categoryRepository.findById(id).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CATEGORY)
+        );
 
+        categoryRepository.delete(category);
     }
 }

@@ -2,6 +2,7 @@ package com.upinmcSE.coffeeshop.controller;
 
 import com.upinmcSE.coffeeshop.dto.request.RoleRequest;
 import com.upinmcSE.coffeeshop.dto.response.RoleResponse;
+import com.upinmcSE.coffeeshop.dto.response.SuccessResponse;
 import com.upinmcSE.coffeeshop.service.impl.RoleServiceImpl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,4 +29,16 @@ public class RoleController {
         return ResponseEntity.ok().body(roleService.getAll());
     }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<RoleResponse> update(@RequestParam("id") String id, @RequestBody RoleRequest request){
+        return ResponseEntity.ok().body(roleService.update(id, request));
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public SuccessResponse<String> delete(@RequestParam("id") String id){
+        roleService.delete(id);
+        return SuccessResponse.<String>builder()
+                .message("Delete role successfully")
+                .build();
+    }
 }

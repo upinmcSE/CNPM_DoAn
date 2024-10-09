@@ -28,7 +28,8 @@ public enum ErrorCode {
     FILE_EMPTY(2007, "File is empty", HttpStatus.NOT_FOUND),
     NOT_FOUND_CUSTOMER(2008, "Not found customer", HttpStatus.NOT_FOUND),
     NOT_FOUND_EMPLOYEE(2009, "Not found employee", HttpStatus.NOT_FOUND),
-    NOT_FOUND_ORDER(3001, "Not found order", HttpStatus.NOT_FOUND)
+    NOT_FOUND_ORDER(3001, "Not found order", HttpStatus.NOT_FOUND),
+    NOT_FOUND_EMPLOYEELV(3002, "Not found employee lv", HttpStatus.NOT_FOUND)
 
     ;
 

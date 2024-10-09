@@ -45,7 +45,15 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleResponse update(String id, RoleRequest request) {
-        return null;
+        var role = roleRepository.findById(id).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_ROLE));
+        role.setName(request.name());
+        role.setDescription(request.description());
+
+        var permissions = permissionRepository.findAllByName(request.permissions());
+        role.setPermissions(new HashSet<>(permissions));
+        role = roleRepository.saveAndFlush(role);
+        return roleMapper.toRoleResponse(role);
     }
 
     @Override
@@ -58,6 +66,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void delete(String id) {
-
+        var role = roleRepository.findById(id).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_ROLE));
+        roleRepository.delete(role);
     }
 }

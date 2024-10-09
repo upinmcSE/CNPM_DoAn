@@ -7,10 +7,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,5 +22,11 @@ public class EmployeeController {
     public ResponseEntity<EmployeeResponse> create(@RequestBody EmployeeRequest request){
         return ResponseEntity.ok().body(employeeService.add(request));
     }
+
+    @GetMapping("get-all")
+    public ResponseEntity<List<EmployeeResponse>> getAll(){
+        return ResponseEntity.ok().body(employeeService.getAll());
+    }
+    
 
 }

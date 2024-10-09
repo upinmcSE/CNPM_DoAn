@@ -25,7 +25,9 @@ public class AuthenticationController {
     AuthenticationServiceImpl authenticationService;
 
     @PostMapping("/customer-login")
-    public SuccessResponse<AuthenticationResponse> customerLogin(@RequestBody AuthenticationRequest request)
+    public SuccessResponse<AuthenticationResponse> customerLogin(
+            @RequestBody AuthenticationRequest request
+    )
             throws JOSEException, InvocationTargetException, NoSuchMethodException, IllegalAccessException
     {
         return SuccessResponse.<AuthenticationResponse>builder()

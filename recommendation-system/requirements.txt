@@ -1,2 +1,6 @@
 pandas
 scikit-learn
+tensorflow
+tensorflow-recommenders
+flask 
+import-ipynb

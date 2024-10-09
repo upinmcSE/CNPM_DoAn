@@ -45,7 +45,7 @@ public class PaymentController {
     public ResponseEntity<?> createPayment() {
         try {
 
-            String orderId = "dc278c99-b3f4-4cc4-af4d-9e96f1f102c4";
+            String orderId = "637ad6bf-5209-478c-946e-4fd3afa41fd7";
 
             // Tạo request body cho MoMo
             Map<String, Object> requestBody = paymentService.createPaymentMOMO(orderId);

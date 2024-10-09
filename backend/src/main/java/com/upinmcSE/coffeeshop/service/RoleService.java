@@ -9,7 +9,6 @@ import java.util.List;
 public interface RoleService {
     RoleResponse add(RoleRequest request);
     RoleResponse update(String id, RoleRequest request);
-
     List<RoleResponse> getAll();
     void delete(String id);
 }

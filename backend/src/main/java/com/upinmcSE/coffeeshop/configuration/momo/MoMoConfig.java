@@ -12,7 +12,6 @@ import java.util.Map;
 
 @Getter
 @Component
-
 public class MoMoConfig {
     @Value("${payment.momo.partnerCode}")
     private String partnerCode;

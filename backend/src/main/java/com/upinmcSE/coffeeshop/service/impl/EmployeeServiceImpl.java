@@ -65,16 +65,30 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeResponse update(String id, EmployeeRequest request) {
-        return null;
+        var employee = employeeRepository.findById(id).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_EMPLOYEE));
+        employee.setFullName(request.fullName());
+        employee.setEmail(request.email());
+        employee.setAge(request.age());
+        EmployeeLv employeeLv = employeeLVRepository.findByName(request.employeeLv()).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_EMPLOYEELV));
+        employee.setEmployeeLv(employeeLv);
+        employee.setSalary(request.salary());
+        WorkTime workTime = workTimeRepository.findByName(request.workTime()).orElseThrow(
+                () -> new ErrorException(ErrorCode.WORK_TIME));
+        employee.setWorkTime(workTime);
+        return employeeMapper.toEmployeeResponse(employeeRepository.saveAndFlush(employee));
     }
 
     @Override
     public List<EmployeeResponse> getAll() {
-        return null;
+        return employeeRepository.findAll()
+                .stream().map(employeeMapper::toEmployeeResponse)
+                .toList();
     }
 
     @Override
     public void delete(String id) {
-
+        employeeRepository.deleteById(id);
     }
 }

@@ -59,6 +59,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         var customer = customerRepository.findByUsername(request.username()).orElseThrow(
                 () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+
         boolean authenticated = passwordEncoder.matches(request.password(), customer.getPassword());
 
         if(!authenticated) throw new ErrorException(ErrorCode.NOT_MATCH_PW);
