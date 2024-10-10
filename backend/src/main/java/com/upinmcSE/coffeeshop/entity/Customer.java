@@ -20,6 +20,10 @@ public class Customer extends User{
     @JoinColumn(name = "member_lv_id")
     MemberLv memberLv;
 
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+
     Integer point;
 
 }

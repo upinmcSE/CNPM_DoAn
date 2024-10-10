@@ -5,7 +5,6 @@ function Banner() {
     return ( 
         <div className={container}>
             <div className={title}>
-                <h1>ádasdas</h1>
             </div>
         </div>
      );

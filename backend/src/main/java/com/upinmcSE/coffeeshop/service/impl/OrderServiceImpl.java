@@ -21,22 +21,15 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
     OrderRepository orderRepository;
     OrderLineRepository orderLineRepository;
-    OrderTypeRepository orderTypeRepository;
     OrderMapper orderMapper;
     CustomerRepository customerRepository;
-    EmployeeRepository employeeRepository;
 
 
     @Override
     public OrderResponse add(OrderRequest request) {
-        OrderType orderType = orderTypeRepository.findByName(request.orderType()).orElseThrow(
-                () -> new RuntimeException("Not found order type"));
 
         Customer customer = customerRepository.findById(request.customerId()).orElseThrow(
                 () -> new RuntimeException("Not found customer"));
-
-        Employee employee = employeeRepository.findById(request.employeeId()).orElseThrow(
-                () -> new RuntimeException("Not found employee"));
 
         List<OrderLine> orderLines = orderLineRepository.findAllById(request.orderLines());
 
@@ -48,8 +41,6 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = Order.builder()
                 .customer(customer)
-                .orderType(orderType)
-                .employee(employee)
                 .orderLines(orderLines)
                 .totalPrice(total)
                 .build();

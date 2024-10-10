@@ -1,9 +1,6 @@
 package com.upinmcSE.coffeeshop.entity;
 
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -35,8 +32,5 @@ public class User {
     @LastModifiedDate
     LocalDate modifiedDate;
 
-    @OneToOne
-    @JoinColumn(name = "role_id", nullable = false)
-    Role role;
 
 }

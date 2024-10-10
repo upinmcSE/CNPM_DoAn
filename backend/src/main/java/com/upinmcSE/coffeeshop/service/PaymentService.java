@@ -10,4 +10,6 @@ public interface PaymentService {
 
     Map<String, Object> createPaymentMOMO(String orderId) throws Exception;
 
+    void handCallBack(String orderInfo);
+
 }

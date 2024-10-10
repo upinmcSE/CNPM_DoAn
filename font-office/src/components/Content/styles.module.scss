@@ -1,0 +1,19 @@
+.container{
+    background-color: #B3B3B3;
+    height: 500px;
+    width: 100%;
+}
+
+
+
+.title {
+    justify-content: center;
+    display: flex;
+}
+
+.des{
+    font-size: 24px;
+    text-transform: uppercase;
+    border-bottom: 2px solid black; 
+    padding-bottom: 5px; 
+}

@@ -32,12 +32,15 @@ public class PaymentController {
     }
 
     @GetMapping("/vn-pay-callback")
-    public ResponseObject<VNPayResponse> vnPayCallbackHandler(HttpServletRequest request) {
+    public SuccessResponse<?> vnPayCallbackHandler(HttpServletRequest request) {
         String status = request.getParameter("vnp_ResponseCode");
-        if (status.equals("00")) {
-            return new ResponseObject<>(HttpStatus.OK, "Success", new VNPayResponse("00", "Success", ""));
-        } else {
-            return new ResponseObject<>(HttpStatus.BAD_REQUEST, "Failed", null);
+        String amount = request.getParameter("vnp_Amount");
+        String orderInfo = request.getParameter("vnp_OrderInfo");
+        if(status.equals("00")){
+            paymentService.handCallBack(orderInfo);
+            return SuccessResponse.builder().message("Payment Successfully, Total price: "+ amount).build();
+        }else{
+            return SuccessResponse.builder().message("Payment Fail").build();
         }
     }
 
@@ -45,7 +48,7 @@ public class PaymentController {
     public ResponseEntity<?> createPayment() {
         try {
 
-            String orderId = "637ad6bf-5209-478c-946e-4fd3afa41fd7";
+            String orderId = "61dc575b-7943-464e-aa49-27d004a909d3";
 
             // Tạo request body cho MoMo
             Map<String, Object> requestBody = paymentService.createPaymentMOMO(orderId);

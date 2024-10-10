@@ -10,7 +10,6 @@ import java.util.List;
 public record OrderResponse(
         String id,
         String customerName,
-        String employeeName,
         List<OrderLineResponse> orderLines,
         double totalPrice,
         LocalDate createdDate,

@@ -25,16 +25,8 @@ public class Order {
     String id;
 
     @ManyToOne
-    @JoinColumn(name="order_type_id")
-    OrderType orderType;
-
-    @ManyToOne
     @JoinColumn(name = "customer_id")
     Customer customer;
-
-    @ManyToOne
-    @JoinColumn(name = "employee_id")
-    Employee employee;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     List<OrderLine> orderLines;

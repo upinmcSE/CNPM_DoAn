@@ -4,9 +4,11 @@ import com.upinmcSE.coffeeshop.configuration.momo.MoMoConfig;
 import com.upinmcSE.coffeeshop.configuration.vnpay.VNPAYConfig;
 import com.upinmcSE.coffeeshop.dto.response.PaymentResponse;
 import com.upinmcSE.coffeeshop.entity.Order;
+import com.upinmcSE.coffeeshop.entity.Payment;
 import com.upinmcSE.coffeeshop.exception.ErrorCode;
 import com.upinmcSE.coffeeshop.exception.ErrorException;
 import com.upinmcSE.coffeeshop.repository.OrderRepository;
+import com.upinmcSE.coffeeshop.repository.PaymentRepository;
 import com.upinmcSE.coffeeshop.service.PaymentService;
 import com.upinmcSE.coffeeshop.utils.vnpay.VNPayUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +26,7 @@ import java.util.Map;
 public class PaymentServiceImpl implements PaymentService {
 
     OrderRepository orderRepository;
+    PaymentRepository paymentRepository;
     VNPAYConfig vnpayConfig;
     MoMoConfig moMoConfig;
     @Override
@@ -35,14 +38,12 @@ public class PaymentServiceImpl implements PaymentService {
         long amount = Math.round(order.getTotalPrice() * 100L);
 //        System.out.println(Math.round(order.getTotalPrice()));
 //        System.out.println(amount);
-        String bankCode = request.getParameter("bankCode");
+        String bankCode = "NCB";
 
         Map<String, String> vnpParamsMap = vnpayConfig.getVNPayConfig();
         vnpParamsMap.put("vnp_OrderInfo", "Thanh toan don hang: "+ order.getId());
         vnpParamsMap.put("vnp_Amount", String.valueOf(amount));
-        if(bankCode != null & bankCode.isEmpty()){ 
-            vnpParamsMap.put("vnp_BankCode", bankCode);
-        }
+        vnpParamsMap.put("vnp_BankCode", bankCode);
         vnpParamsMap.put("vnp_IpAddr", VNPayUtil.getIpAddress(request));
 
         //build query url
@@ -66,5 +67,17 @@ public class PaymentServiceImpl implements PaymentService {
 
     }
 
+    @Override
+    public void handCallBack(String orderInfo) {
+        System.out.println(orderInfo);
+        String prefix = "Thanh toan don hang: ";
+        int startIndex = orderInfo.indexOf(prefix) + prefix.length();
+
+        String orderId = orderInfo.substring(startIndex, startIndex + 36);
+        var order  = orderRepository.findById(orderId).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_ORDER));
+
+        paymentRepository.save(Payment.builder().order(order).build());
+    }
 
 }

@@ -20,6 +20,10 @@ public class Employee extends User {
     @JoinColumn(name = "employee_lv_id")
     EmployeeLv employeeLv;
 
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+
     double salary;
     Integer workingDays;
 
