@@ -29,6 +29,7 @@ public class SecurityConfig {
             "api/v1/payment/vn-pay-callback",
             "/api/v1/products/getall",
             "/api/v1/products/getall-by-category",
+            "api/v1/products/images/**",
             "/api/v1/payment/callback"
     };
 

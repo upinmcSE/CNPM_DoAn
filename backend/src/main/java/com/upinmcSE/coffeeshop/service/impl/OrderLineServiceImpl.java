@@ -4,6 +4,8 @@ import com.upinmcSE.coffeeshop.dto.request.OrderLineRequest;
 import com.upinmcSE.coffeeshop.dto.response.OrderLineResponse;
 import com.upinmcSE.coffeeshop.dto.response.ProductResponse;
 import com.upinmcSE.coffeeshop.entity.OrderLine;
+import com.upinmcSE.coffeeshop.exception.ErrorCode;
+import com.upinmcSE.coffeeshop.exception.ErrorException;
 import com.upinmcSE.coffeeshop.repository.OrderLineRepository;
 import com.upinmcSE.coffeeshop.repository.ProductRepository;
 import com.upinmcSE.coffeeshop.service.OrderLineService;
@@ -21,7 +23,9 @@ public class OrderLineServiceImpl implements OrderLineService {
     @Override
     public OrderLineResponse add(OrderLineRequest request) {
         OrderLine orderLine = OrderLine.builder()
-                .product(productRepository.findById(request.productId()).orElseThrow())
+                .product(productRepository.findById(request.productId()).orElseThrow(
+                        () -> new ErrorException(ErrorCode.NOT_FOUND_PRODUCT)
+                ))
                 .amount(request.amount())
                 .build();
         orderLine = orderLineRepository.save(orderLine);

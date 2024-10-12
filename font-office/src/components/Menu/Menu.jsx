@@ -11,7 +11,7 @@ const Menu = ({ data }) => {
                     {data.map((item) => (
                         <ProductCard
                         key={item.id}
-                        src={`http://localhost:8081/images/${item.urlImage}`} // Thay đổi thành urlImage
+                        src={item.urlImage} // Thay đổi thành urlImage
                         name={item.name}
                         price={item.price}
                         />

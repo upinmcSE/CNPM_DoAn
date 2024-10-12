@@ -10,7 +10,9 @@ import com.upinmcSE.coffeeshop.service.impl.ProductServiceImpl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +21,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/api/v1/products")
 public class ProductController {
     private final ProductServiceImpl productService;
@@ -42,7 +46,7 @@ public class ProductController {
     @GetMapping("/getall")
     public ResponseEntity<PageResponse<ProductResponse>> getProducts(
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") int size
+            @RequestParam(value = "size", required = false, defaultValue = "9") int size
     ) {
         PageResponse<ProductResponse> productResponse = productService.getOutstandingProduct(page, size);
         return ResponseEntity.ok(productResponse);
@@ -51,7 +55,7 @@ public class ProductController {
     @GetMapping("/getall-by-category")
     public ResponseEntity<PageResponse<ProductResponse>> getProductByCategory(
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") int size,
+            @RequestParam(value = "size", required = false, defaultValue = "9") int size,
             @RequestParam(value = "category") String category
     ) {
         PageResponse<ProductResponse> productResponse = productService.getCategoryProduct(page, size, category);
@@ -68,6 +72,29 @@ public class ProductController {
             return ResponseEntity.ok(response.getBody());
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @GetMapping("/images/{imageName}")
+    public ResponseEntity<?> viewImage(@PathVariable String imageName) {
+        try {
+            java.nio.file.Path imagePath = Paths.get("uploads/"+imageName);
+            UrlResource resource = new UrlResource(imagePath.toUri());
+
+            if (resource.exists()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(resource);
+            } else {
+                log.info(imageName + " not found");
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(new UrlResource(Paths.get("uploads/notfound.jpeg").toUri()));
+                //return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("Error occurred while retrieving image: " + e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 

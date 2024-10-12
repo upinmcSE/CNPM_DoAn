@@ -1,0 +1,22 @@
+@import '@styles/mixin.module.scss';
+
+.container {
+    @include flex_box_custom(space-between, center, 50px);
+
+    width: 100%;
+    height: 300px;
+    background-color: #575757;
+}
+
+.containerContent {
+    display: flex; /* Sử dụng Flexbox */
+    justify-content: space-between; /* Cách đều các phần tử */
+    align-items: flex-start; /* Căn chỉnh theo chiều dọc (có thể thay đổi tùy ý) */
+    padding: 10px; /* Khoảng cách bên trong */
+    color: white; /* Đặt màu văn bản thành trắng */
+}
+
+.containerContent > div {
+    flex: 1; /* Mỗi div con chiếm không gian đều nhau */
+    margin: 0 190px; /* Khoảng cách giữa các div con */
+}

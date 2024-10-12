@@ -13,7 +13,7 @@ public class ProductMapper {
                 .price(product.getPrice())
                 .description(product.getDescription())
                 .category(product.getCategory().getName())
-                .urlImage(product.getProductImages().getImageUrl())
+                .urlImage(product.getProductImage().getImageUrl())
                 .build();
     }
 }

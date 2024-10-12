@@ -1,6 +1,5 @@
 package com.upinmcSE.coffeeshop.entity;
 
-import com.upinmcSE.coffeeshop.enums.CategoryType;
 import jakarta.persistence.*;
 import lombok.*;
 

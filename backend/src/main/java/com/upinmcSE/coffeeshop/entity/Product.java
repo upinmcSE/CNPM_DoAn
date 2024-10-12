@@ -26,7 +26,7 @@ public class Product {
     Category category;
 
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    ProductImage productImages;
+    ProductImage productImage;
 
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Inventory inventory;

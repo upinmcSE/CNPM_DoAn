@@ -14,6 +14,7 @@ import com.upinmcSE.coffeeshop.repository.OrderLineRepository;
 import com.upinmcSE.coffeeshop.repository.ProductImageRepository;
 import com.upinmcSE.coffeeshop.repository.ProductRepository;
 import com.upinmcSE.coffeeshop.service.ProductService;
+import com.upinmcSE.coffeeshop.utils.FileUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -41,6 +42,7 @@ public class ProductServiceImpl implements ProductService {
     ProductMapper productMapper;
     ProductImageRepository productImageRepository;
     OrderLineRepository orderLineRepository;
+    FileUtil fileUtil;
 
 
 
@@ -68,7 +70,7 @@ public class ProductServiceImpl implements ProductService {
         // tạo product image
         ProductImage productImage = createProductImage(product.getId(), file);
 
-        product.setProductImages(productImage);
+        product.setProductImage(productImage);
         return productMapper.toProductResponse(product);
     }
     @Override
@@ -76,13 +78,13 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_PRODUCT));
 
-        ProductImage oldImage = product.getProductImages();
+        ProductImage oldImage = product.getProductImage();
         if (oldImage != null) {
             productImageRepository.delete(oldImage);
         }
 
         ProductImage productImage = createProductImage(productId, file);
-        product.setProductImages(productImage);
+        product.setProductImage(productImage);
 
         return productMapper.toProductResponse(product);
     }
@@ -166,10 +168,10 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // Lưu file vào hệ thống và lấy tên file
-        String filename = storeFile(file);
+        String filename = fileUtil.storeFile(file);
 
         // Kiểm tra xem sản phẩm đã có ảnh chưa (One-to-One relationship)
-        ProductImage existingProductImage = product.getProductImages();
+        ProductImage existingProductImage = product.getProductImage();
         if (existingProductImage != null) {
             // Xóa ảnh cũ nếu đã tồn tại
             productImageRepository.delete(existingProductImage);
@@ -186,33 +188,33 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    private String storeFile(MultipartFile file) throws IOException {
-        if (!isImageFile(file) || file.getOriginalFilename() == null) {
-            throw new IOException("Invalid image format");
-        }
-        String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-
-        // Thêm UUID vào trước tên file để đảm bảo tên file là duy nhất
-        String uniqueFilename = UUID.randomUUID().toString() + "_" + filename;
-
-        // Đường dẫn đến thư mục mà bạn muốn lưu file
-        Path uploadDir = Paths.get("uploads");
-
-        // Kiểm tra và tạo thư mục nếu nó không tồn tại
-        if (!Files.exists(uploadDir)) {
-            Files.createDirectories(uploadDir);
-        }
-
-        // Đường dẫn đầy đủ đến file
-        Path destination = Paths.get(uploadDir.toString(), uniqueFilename);
-
-        // Sao chép file vào thư mục đích
-        Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-        return uniqueFilename;
-    }
-
-    private boolean isImageFile(MultipartFile file) {
-        String contentType = file.getContentType();
-        return contentType != null && contentType.startsWith("image/");
-    }
+//    private String storeFile(MultipartFile file) throws IOException {
+//        if (!isImageFile(file) || file.getOriginalFilename() == null) {
+//            throw new IOException("Invalid image format");
+//        }
+//        String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+//
+//        // Thêm UUID vào trước tên file để đảm bảo tên file là duy nhất
+//        String uniqueFilename = UUID.randomUUID().toString() + "_" + filename;
+//
+//        // Đường dẫn đến thư mục mà bạn muốn lưu file
+//        Path uploadDir = Paths.get("uploads");
+//
+//        // Kiểm tra và tạo thư mục nếu nó không tồn tại
+//        if (!Files.exists(uploadDir)) {
+//            Files.createDirectories(uploadDir);
+//        }
+//
+//        // Đường dẫn đầy đủ đến file
+//        Path destination = Paths.get(uploadDir.toString(), uniqueFilename);
+//
+//        // Sao chép file vào thư mục đích
+//        Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+//        return uniqueFilename;
+//    }
+//
+//    private boolean isImageFile(MultipartFile file) {
+//        String contentType = file.getContentType();
+//        return contentType != null && contentType.startsWith("image/");
+//    }
 }
