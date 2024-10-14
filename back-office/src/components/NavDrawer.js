@@ -42,7 +42,7 @@ const MyListItemButton = ({selected, icon, text, handleNavbarItemClicked}) => {
 }
 
 
-const DrawerHeader = styled('div')(({ theme }) => ({
+export const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   padding: theme.spacing(0, 1),

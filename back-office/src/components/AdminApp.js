@@ -4,7 +4,7 @@ import { Colors, DrawerWidth } from "../styles/theme"
 import { BrowserRouter as Router } from "react-router-dom"
 import AppRoutes from "../Routes"
 import { useState } from "react";
-import NavDrawer from "./NavDrawer"
+import NavDrawer, {DrawerHeader} from "./NavDrawer"
 
 
 
@@ -45,7 +45,8 @@ export default function AdminApp(){
             <Router>
                 <NavDrawer open={open} setOpen={setOpen} />
                 <Main open={open}>
-                    <AppRoutes />
+                  <DrawerHeader />
+                  <AppRoutes />
                 </Main>
             </Router>
         </Box>
