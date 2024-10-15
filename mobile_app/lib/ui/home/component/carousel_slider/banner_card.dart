@@ -12,12 +12,16 @@ class BannerCard extends StatelessWidget {
 
   // Hàm gọi API để lấy URL ảnh từ Backend
   Future<String> _fetchImageFromBackend() async {
-    final response = await http.get(Uri.parse('$baseUrl/api/v1/images/$imageUrl'));
+    final response = await http.get(Uri.parse('$baseUrl/api/v1/banners/images/$imageUrl'));
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return data['imageUrl'];
+      // Check if the response is an image
+      if (response.headers['content-type']?.contains('image/jpeg') ?? false) {
+        return '$baseUrl/api/v1/banners/images/$imageUrl';
+      } else {
+        throw Exception('Unexpected content type: ${response.headers['content-type']}');
+      }
     } else {
-      throw Exception('Failed to load image');
+      throw Exception('Failed to load image: ${response.reasonPhrase}');
     }
   }
 
@@ -46,8 +50,11 @@ class BannerCard extends StatelessWidget {
             ),
           );
         } else if (snapshot.hasError) {
-          return const Center(
-            child: Icon(Icons.error, color: Colors.red),
+          return Center(
+            child: Text(
+              'Error: ${snapshot.error}',
+              style: const TextStyle(color: Colors.red),
+            ),
           );
         } else {
           return Container(

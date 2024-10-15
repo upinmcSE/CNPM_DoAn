@@ -34,6 +34,7 @@ public class BannerController {
         return ResponseEntity.ok().body(bannerService.getBanners());
     }
 
+    @CrossOrigin(origins = {"http://localhost:8081", "http://192.168.0.108:8081"})
     @GetMapping("/images/{imageName}")
     public ResponseEntity<?> viewImage(@PathVariable String imageName) {
         try {

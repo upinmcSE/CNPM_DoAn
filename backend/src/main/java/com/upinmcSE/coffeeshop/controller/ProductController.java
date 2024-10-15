@@ -46,6 +46,15 @@ public class ProductController {
     @GetMapping("/getall")
     public ResponseEntity<PageResponse<ProductResponse>> getProducts(
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size
+    ) {
+        PageResponse<ProductResponse> productResponse = productService.getProducts(page, size);
+        return ResponseEntity.ok(productResponse);
+    }
+
+    @GetMapping("/outstanding")
+    public ResponseEntity<PageResponse<ProductResponse>> getOutstandingProduct(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "9") int size
     ) {
         PageResponse<ProductResponse> productResponse = productService.getOutstandingProduct(page, size);

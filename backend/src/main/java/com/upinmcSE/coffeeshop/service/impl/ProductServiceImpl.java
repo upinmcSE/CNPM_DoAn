@@ -121,6 +121,20 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public PageResponse<ProductResponse> getProducts(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        var pageData = productRepository.findAll(pageable);
+
+        return PageResponse.<ProductResponse>builder()
+                .currentPage(page)
+                .pageSize(pageData.getSize())
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream().map(productMapper::toProductResponse).toList())
+                .build();
+    }
+
+    @Override
     public PageResponse<ProductResponse> getCategoryProduct(int page, int pageSize, String category) {
         Sort sort = Sort.by("price").descending();
 

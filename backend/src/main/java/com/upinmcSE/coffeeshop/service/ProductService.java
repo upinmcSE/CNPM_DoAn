@@ -15,6 +15,8 @@ public interface ProductService {
     ProductResponse updateImage(String id,  MultipartFile file) throws IOException;
 
     PageResponse<ProductResponse> getOutstandingProduct(int page, int size);
+
+    PageResponse<ProductResponse> getProducts(int page, int size);
     PageResponse<ProductResponse> getCategoryProduct(int page, int size, String category);
     ProductResponse getRecommemdProduct(String customerId);
     
