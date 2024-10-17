@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
 import LoginIcon from '@mui/icons-material/Login'; // Thêm biểu tượng đăng nhập
 import Typography from '@mui/material/Typography';
@@ -67,9 +67,15 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 function Appbar({ open, handleDrawerOpen }) {
-    const [openLoginDialog, setOpenLoginDialog] = useState(false); // Trạng thái hiển thị dialog đăng nhập
-    const token = localStorage.getItem('token');
-    const [isLoggedIn, setIsLoggedIn] = useState(!!token); // Kiểm tra xem có token hay không để xác định trạng thái đăng nhập
+    const [openLoginDialog, setOpenLoginDialog] = useState(false); 
+    const [isLoggedIn, setIsLoggedIn] = useState(false); 
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            setIsLoggedIn(true); // Cập nhật trạng thái nếu token tồn tại
+        }
+    }, []);
 
     const handleLoginDialogOpen = () => {
         setOpenLoginDialog(true);
@@ -99,10 +105,14 @@ function Appbar({ open, handleDrawerOpen }) {
             
             // Giả sử rằng token được trả về trong 'userData'
             const token = userData.token; // Điều này cần kiểm tra theo cấu trúc thực tế của phản hồi
-            console.log(token)
-            localStorage.setItem('token', token); // Lưu token vào localStorage
-            handleLoginSuccess(); // Cập nhật trạng thái đăng nhập
-            handleLoginDialogClose(); // Đóng dialog đăng nhập
+            if (token) {
+                console.log(token);
+                localStorage.setItem('token', token); // Lưu token vào localStorage
+                handleLoginSuccess(); // Cập nhật trạng thái đăng nhập
+                handleLoginDialogClose(); // Đóng dialog đăng nhập
+            } else {
+                throw new Error('Invalid login response');
+            }
         } catch (error) {
             console.error('Login failed:', error); // In ra lỗi nếu có
             alert('Đăng nhập không thành công!'); // Hiển thị thông báo lỗi
@@ -110,20 +120,13 @@ function Appbar({ open, handleDrawerOpen }) {
     };
 
     const handleLogout = async () => {
-        if (!token) return; // Nếu không có token, không cần đăng xuất
-
         try {
-            const response = await logout(token); // Gọi hàm logout
-
-            if (response.success) {
-                setIsLoggedIn(false); // Cập nhật trạng thái đăng nhập
-                alert(response.message); // Hiển thị thông báo
-            } else {
-                alert(response.message); // Hiển thị thông báo lỗi
-            }
+            await logout(); // Gọi hàm logout từ authService
+            localStorage.removeItem('token'); // Xóa token khỏi localStorage
+            setIsLoggedIn(false); // Cập nhật trạng thái đăng xuất
         } catch (error) {
-            console.error("Logout error:", error);
-            alert('Có lỗi xảy ra khi đăng xuất!');
+            console.error('Logout failed:', error); // In ra lỗi nếu có
+            alert('Đăng xuất không thành công!'); // Hiển thị thông báo lỗi
         }
     };
     return (

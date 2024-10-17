@@ -27,18 +27,11 @@ import Pagination from "@mui/material/Pagination";
 
 
 
-// const products = [{
-//     _id: 12345,
-//     name: "Sữa chua chuối",
-//     price: 30000,
-//     description: " Sữa chua và chuối"
-// }]
-
-
 const validationSchema = Yup.object().shape({
     name: Yup.string().required("Name product is required"),
     price: Yup.number().required('Price is required').positive("Price must be "),
-    description: Yup.string().required("Description is required")
+    description: Yup.string().required("Description is required"),
+    category: Yup.string().required("Category is required")
 })
 
 
@@ -48,12 +41,7 @@ function Products() {
     const [listProducts, setListProducts] = useState([])
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1); 
-    // // Load danh sach san pham tu backend
-    // useEffect(() => {
-    //     getProducts().then((res) => {
-    //         setListProducts(res.data);
-    //     })
-    // }, []) // Thêm [] để chỉ load 1 lần khi component mount
+
 
     // Load danh sách sản phẩm theo trang
     useEffect(() => {
@@ -76,6 +64,7 @@ function Products() {
         name: "",
         price: "",
         description: "",
+        category: "",
         image: null
     })
 
@@ -84,7 +73,8 @@ function Products() {
             _id: -1,
             name: "",
             price: "",
-            description: ""
+            description: "",
+            category: "",
         })
         setOpen(true)
     }
@@ -102,19 +92,49 @@ function Products() {
     const handleSubmit = async (values, { resetForm }) => {
         try {
             const formData = new FormData();
-            
-            // Thêm các field vào FormData từ ProductRequest
-            formData.append("request.name", values.name);
-            formData.append("request.price", values.price);
-            formData.append("request.description", values.description);
-            
-            // Thêm file ảnh vào FormData
-            if (values.image) {
-                formData.append("file", values.image);
+
+            if (values.name) {
+                formData.append("name", values.name);
+            } else {
+                throw new Error("Name is required");
+            }
+
+            // Chuyển đổi giá trị price từ string sang double
+            const price = parseFloat(values.price);
+            if (!isNaN(price)) { // Kiểm tra xem giá trị đã được chuyển đổi thành công chưa
+                formData.append("price", price);
+            } else {
+                throw new Error("Price must be a valid number");
             }
     
+            if (values.description) {
+                formData.append("description", values.description);
+            } else {
+                throw new Error("Description is required");
+            }
+
+            if (values.category) {
+                formData.append("category", values.category);
+            } else {
+                throw new Error("Category is required");
+            }
+    
+            // Thêm file ảnh vào FormData
+            if (values.image) {
+                console.log("Image:", values.image.name);
+                formData.append("file", values.image); // Thêm tệp ảnh vào FormData
+            }
+    
+            console.log("Form data before API call:", {
+                name: values.name,
+                price: price,
+                description: values.description,
+                category: values.category,
+                image: values.image ? values.image.name : null,
+            });
+    
             // Gọi API với FormData
-            const newProduct = await addProduct(formData);
+            const newProduct = await addProduct(formData); // Đảm bảo addProduct có thể xử lý FormData
             setListProducts(prev => [...prev, newProduct]); // Cập nhật danh sách sản phẩm
             resetForm();
             setOpen(false);
@@ -177,16 +197,14 @@ function Products() {
                 sx={{ mt: 2, display: 'flex', justifyContent: 'center' }} 
             />
 
-            <Dialog 
-                open={open}
-                fullWidth
-                maxWidth='lg'
-            >
-                <DialogTitle >
-                    {"Add Product"}
-                </DialogTitle>
-                <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
-                    {({ dirty, isValid, setFieldValue, getFieldProps}) =>
+        <Dialog open={open} fullWidth maxWidth="lg">
+                <DialogTitle>Add Product</DialogTitle>
+                <Formik
+                    initialValues={initialValues}
+                    validationSchema={validationSchema}
+                    onSubmit={handleSubmit}
+                >
+                    {({ dirty, isValid, setFieldValue }) => (
                         <Form>
                             <DialogContent>
                                 <Grid container spacing={2}>
@@ -199,10 +217,9 @@ function Products() {
                                             fullWidth
                                         />
                                         <ErrorMessage name="name">
-                                            {message => <Typography color="red">{message}</Typography>}
+                                            {(msg) => <Typography color="red">{msg}</Typography>}
                                         </ErrorMessage>
                                     </Grid>
-
                                     <Grid item xs={12}>
                                         <Field
                                             as={TextField}
@@ -212,10 +229,9 @@ function Products() {
                                             fullWidth
                                         />
                                         <ErrorMessage name="price">
-                                            {message => <Typography color="red">{message}</Typography>}
+                                            {(msg) => <Typography color="red">{msg}</Typography>}
                                         </ErrorMessage>
                                     </Grid>
-
                                     <Grid item xs={12}>
                                         <Field
                                             as={TextField}
@@ -225,7 +241,19 @@ function Products() {
                                             fullWidth
                                         />
                                         <ErrorMessage name="description">
-                                            {message => <Typography color="red">{message}</Typography>}
+                                            {(msg) => <Typography color="red">{msg}</Typography>}
+                                        </ErrorMessage>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Field
+                                            as={TextField}
+                                            name="category"
+                                            label="Category"
+                                            required
+                                            fullWidth
+                                        />
+                                        <ErrorMessage name="category">
+                                            {(msg) => <Typography color="red">{msg}</Typography>}
                                         </ErrorMessage>
                                     </Grid>
                                     <Grid item xs={12}>
@@ -235,24 +263,24 @@ function Products() {
                                             onChange={(event) =>
                                                 setFieldValue("image", event.currentTarget.files[0])
                                             }
-                                            required
                                         />
-                                        <ErrorMessage name="image">
-                                            {message => <Typography color="red">{message}</Typography>}
-                                        </ErrorMessage>
                                     </Grid>
                                 </Grid>
                             </DialogContent>
 
                             <DialogActions>
-                                {getFieldProps("_id").value !== -1 ? (
-                                    <Button disabled={!dirty | !isValid} onClick={handleSubmit} type="submit" variant="contained" color="primary">Save edit</Button>)
-                                    :<Button disabled={!dirty | !isValid} onClick={handleSubmit} type="submit" variant="contained" color="primary">Save</Button>
-                                }
-                                <Button onClick={() =>setOpen(false)} autoFocus>Cancel</Button>
+                                <Button
+                                    disabled={!dirty || !isValid}
+                                    type="submit"
+                                    variant="contained"
+                                    color="primary"
+                                >
+                                    Save
+                                </Button>
+                                <Button onClick={() => setOpen(false)}>Cancel</Button>
                             </DialogActions>
                         </Form>
-                    } 
+                    )}
                 </Formik>
             </Dialog>
         </>

@@ -2,7 +2,7 @@ package com.upinmcSE.coffeeshop.dto.request;
 
 public record ProductRequest(
         String name,
-        double price,
+        Double  price,
         String description,
         String category
 ) {

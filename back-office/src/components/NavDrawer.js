@@ -18,6 +18,7 @@ import Appbar from './Appbar';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import { useNavigate } from 'react-router-dom';
+import {useEffect} from 'react';
 
 const MyListItemButton = ({selected, icon, text, handleNavbarItemClicked}) => {
     return(
@@ -54,6 +55,15 @@ export default function NavDrawer({open, setOpen}) {
   const theme = useTheme();
   const [selectedItem, setSelectedItem] = React.useState('')
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    console.log("xx:", token)
+    if (token) {
+      setIsLoggedIn(true); // Cập nhật trạng thái nếu token tồn tại
+    }
+  }, []);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -64,8 +74,12 @@ export default function NavDrawer({open, setOpen}) {
   };
 
   const handleNavbarItemClicked = (item) => {
-    setSelectedItem(item)
-    navigate(item)
+    if (isLoggedIn) {
+      setSelectedItem(item);
+      navigate(item);
+    } else {
+      alert('Anh xin em đấy, đăng nhập trước đã');
+    }
   }
 
   return (

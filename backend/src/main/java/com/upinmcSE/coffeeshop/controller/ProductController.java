@@ -39,6 +39,7 @@ public class ProductController {
             @ModelAttribute ProductRequest request,
             @RequestParam("file") MultipartFile file
     ) throws IOException {
+        System.out.println(request);
         ProductResponse productResponse = productService.add(request, file);
         return ResponseEntity.ok(productResponse);
     }

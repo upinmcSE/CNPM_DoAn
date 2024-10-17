@@ -29,7 +29,7 @@ public class SecurityConfig {
             "/api/v1/authentication/logout",
             "api/v1/customers/add",
             "api/v1/payment/vn-pay-callback",
-            "/api/v1/products/getall",
+            "/api/v1/products/outstanding",
             "/api/v1/products/getall-by-category",
             "api/v1/products/images/**",
             "api/v1/banners/**",
