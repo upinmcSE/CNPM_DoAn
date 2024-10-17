@@ -17,7 +17,6 @@ const getProducts = async (page = 1, size = 10) => {
 
 const addProduct = async (product) => {
     try {
-        console.log("Product:", product);
         const token = localStorage.getItem('token');
         const res = await axiosClient.post("/products/add", product, {
             headers: {
@@ -33,4 +32,37 @@ const addProduct = async (product) => {
     }
 };
 
-export { getProducts, addProduct }
+const updateProduct = async (id, product) => {
+    try {
+        const token = localStorage.getItem('token');
+        const res = await axiosClient.put(`products/update-info/${id}`, product, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data', // Có thể bỏ qua
+            }
+        });
+        console.log("Product updated successfully:", res.data);
+        return res.data;
+    } catch (error) {
+        console.error("Error updating product:", error.response ? error.response.data : error.message);
+        throw error;
+    }
+}
+
+const deleteProduct = async (id) => {
+    try {
+        const token = localStorage.getItem('token');
+        const res = await axiosClient.delete(`/products/delete/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        console.log("Product deleted successfully:", res.data);
+        return res.data;
+    } catch (error) {
+        console.error("Error deleting product:", error.response ? error.response.data : error.message);
+        throw error;
+    }
+}
+
+export { getProducts, addProduct, updateProduct, deleteProduct }

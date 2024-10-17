@@ -19,6 +19,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import { useNavigate } from 'react-router-dom';
 import {useEffect} from 'react';
+import GroupIcon from '@mui/icons-material/Group';
 
 const MyListItemButton = ({selected, icon, text, handleNavbarItemClicked}) => {
     return(
@@ -121,6 +122,22 @@ export default function NavDrawer({open, setOpen}) {
               <MyListItemButton
                 text={"Products"}
                 icon={<InventoryIcon />}
+                handleNavbarItemClicked={handleNavbarItemClicked}
+                selected={selectedItem.includes('Products')}
+              />
+            </ListItem>
+            <ListItem  disablePadding>
+              <MyListItemButton
+                text={"Customers"}
+                icon={<GroupIcon />}
+                handleNavbarItemClicked={handleNavbarItemClicked}
+                selected={selectedItem.includes('Products')}
+              />
+            </ListItem>
+            <ListItem  disablePadding>
+              <MyListItemButton
+                text={"Employees"}
+                icon={<GroupIcon />}
                 handleNavbarItemClicked={handleNavbarItemClicked}
                 selected={selectedItem.includes('Products')}
               />

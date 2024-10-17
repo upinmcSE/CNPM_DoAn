@@ -2,6 +2,9 @@ package com.upinmcSE.coffeeshop.service.impl;
 
 import com.upinmcSE.coffeeshop.dto.request.CustomerRequest;
 import com.upinmcSE.coffeeshop.dto.response.CustomerResponse;
+import com.upinmcSE.coffeeshop.dto.response.PageResponse;
+import com.upinmcSE.coffeeshop.dto.response.ProductResponse;
+import com.upinmcSE.coffeeshop.entity.Customer;
 import com.upinmcSE.coffeeshop.entity.MemberLv;
 import com.upinmcSE.coffeeshop.enums.MemberLV;
 import com.upinmcSE.coffeeshop.enums.RoleType;
@@ -15,6 +18,9 @@ import com.upinmcSE.coffeeshop.service.CustomerService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -59,8 +65,27 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<CustomerResponse> getAll() {
-        return null;
+    public CustomerResponse updateLevel(String id) {
+        Customer customer = customerRepository.findById(id).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+        MemberLv memberLV = memberLVRepository.findByName("VIP");
+        customer.setMemberLv(memberLV);
+        customer = customerRepository.saveAndFlush(customer);
+        return customerMapper.toCustomerResponse(customer);
+    }
+
+    @Override
+    public PageResponse<CustomerResponse> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Customer> pageData = customerRepository.findAll(pageable);
+
+        return PageResponse.<CustomerResponse>builder()
+                .currentPage(page)
+                .pageSize(pageData.getSize())
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream().map(customerMapper::toCustomerResponse).toList())
+                .build();
     }
 
     @Override

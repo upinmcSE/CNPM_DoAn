@@ -2,6 +2,8 @@ package com.upinmcSE.coffeeshop.controller;
 
 import com.upinmcSE.coffeeshop.dto.request.EmployeeRequest;
 import com.upinmcSE.coffeeshop.dto.response.EmployeeResponse;
+import com.upinmcSE.coffeeshop.dto.response.PageResponse;
+import com.upinmcSE.coffeeshop.dto.response.ProductResponse;
 import com.upinmcSE.coffeeshop.service.impl.EmployeeServiceImpl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +25,13 @@ public class EmployeeController {
         return ResponseEntity.ok().body(employeeService.add(request));
     }
 
-    @GetMapping("get-all")
-    public ResponseEntity<List<EmployeeResponse>> getAll(){
-        return ResponseEntity.ok().body(employeeService.getAll());
+    @GetMapping("/getall")
+    public ResponseEntity<PageResponse<EmployeeResponse>> getEmployees(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size
+    ) {
+        PageResponse<EmployeeResponse> employeeResponses = employeeService.getAll(page, size);
+        return ResponseEntity.ok(employeeResponses);
     }
     
 

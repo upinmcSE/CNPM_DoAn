@@ -22,7 +22,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useEffect, useState } from "react";
 import Grid from '@mui/material/Grid'
-import { getProducts, addProduct } from "../apis/productService";
+import { getProducts, addProduct, updateProduct, deleteProduct } from "../apis/productService";
 import Pagination from "@mui/material/Pagination";
 
 
@@ -70,7 +70,7 @@ function Products() {
 
     const handleAddProduct = () => {
         setInitialValues({
-            _id: -1,
+            id: -1,
             name: "",
             price: "",
             description: "",
@@ -79,13 +79,56 @@ function Products() {
         setOpen(true)
     }
 
-    const handleProductEdit = (product) => {
-        setInitialValues(product)
-        setOpen(true)
-    }
+    const handleEditClick = (product) => {
+        setInitialValues({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            description: product.description,
+            category: product.category,
+        });
+        setOpen(true); // Chỉ mở form, không gọi API
+    };
 
-    const handleDeleteProduct = (product) => {
-        setListProducts(prev => prev.filter(p => p._id !== product._id)); // Cập nhật danh sách
+    const handleProductEdit = async (values, actions) => {
+        try {
+            const formData = new FormData();
+            formData.append("name", values.name);
+            formData.append("price", parseFloat(values.price));
+            formData.append("description", values.description);
+            formData.append("category", values.category);
+    
+            if (values.image) {
+                formData.append("file", values.image);
+            }
+    
+            await updateProduct(values.id, formData); // Gọi API update
+            setListProducts((prev) =>
+                prev.map((product) =>
+                    product.id === values.id ? { ...product, ...values } : product
+                )
+            );
+            actions.resetForm(); // Reset form sau khi cập nhật
+            setOpen(false); // Đóng form
+        } catch (error) {
+            console.error("Error updating product:", error);
+        }
+    };
+
+    const handleDeleteProduct = async  (product) => {
+        console.log("Delete product:", product.id);
+        if (product.id) {
+            // Gọi API để xóa sản phẩm (nếu bạn có API cho việc này)
+            try {
+                await deleteProduct(product.id); // Sử dụng product.id
+                // Cập nhật danh sách sản phẩm sau khi xóa
+                setListProducts(prev => prev.filter(p => p.id !== product.id)); // Sử dụng product.id
+            } catch (error) {
+                console.error("Error deleting product:", error);
+            }
+        } else {
+            console.error("Product does not have an ID");
+        }
     };
 
     // Thay đổi handleSubmit để gọi API addProduct
@@ -176,7 +219,7 @@ function Products() {
                                     />          
                                 </TableCell>
                                 <TableCell>
-                                    <IconButton onClick={() => handleProductEdit(p)}>
+                                    <IconButton onClick={() => handleEditClick(p)}>
                                         <EditIcon />
                                     </IconButton>
                                     <IconButton onClick={() => handleDeleteProduct(p)}>
@@ -202,9 +245,15 @@ function Products() {
                 <Formik
                     initialValues={initialValues}
                     validationSchema={validationSchema}
-                    onSubmit={handleSubmit}
+                    onSubmit={(values, actions) => {
+                        if (values.id === -1) { // Kiểm tra nếu là sản phẩm mới
+                            handleSubmit(values, actions); // Gọi hàm thêm sản phẩm
+                        } else {
+                            handleProductEdit(values, actions); // Gọi hàm chỉnh sửa sản phẩm
+                        }
+                    }}
                 >
-                    {({ dirty, isValid, setFieldValue }) => (
+                    {({ dirty, isValid, setFieldValue, getFieldProps }) => (
                         <Form>
                             <DialogContent>
                                 <Grid container spacing={2}>
@@ -268,7 +317,7 @@ function Products() {
                                 </Grid>
                             </DialogContent>
 
-                            <DialogActions>
+                            {/* <DialogActions>
                                 <Button
                                     disabled={!dirty || !isValid}
                                     type="submit"
@@ -277,6 +326,29 @@ function Products() {
                                 >
                                     Save
                                 </Button>
+                                <Button onClick={() => setOpen(false)}>Cancel</Button>
+                            </DialogActions> */}
+
+                            <DialogActions>
+                                {getFieldProps("id").value ? (
+                                <Button
+                                    disabled={!dirty || !isValid}
+                                    type="submit"
+                                    variant="contained"
+                                    color="primary"
+                                >
+                                    Save Edit
+                                </Button>
+                                ) : (
+                                    <Button
+                                    disabled={!dirty || !isValid}
+                                    type="submit"
+                                    variant="contained"
+                                    color="primary"
+                                >
+                                    Save
+                                </Button>
+                                )}
                                 <Button onClick={() => setOpen(false)}>Cancel</Button>
                             </DialogActions>
                         </Form>

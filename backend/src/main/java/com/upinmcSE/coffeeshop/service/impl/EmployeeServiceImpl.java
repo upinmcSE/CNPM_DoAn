@@ -2,6 +2,8 @@ package com.upinmcSE.coffeeshop.service.impl;
 
 import com.upinmcSE.coffeeshop.dto.request.EmployeeRequest;
 import com.upinmcSE.coffeeshop.dto.response.EmployeeResponse;
+import com.upinmcSE.coffeeshop.dto.response.PageResponse;
+import com.upinmcSE.coffeeshop.dto.response.ProductResponse;
 import com.upinmcSE.coffeeshop.entity.Employee;
 import com.upinmcSE.coffeeshop.entity.EmployeeLv;
 import com.upinmcSE.coffeeshop.entity.Role;
@@ -18,6 +20,9 @@ import com.upinmcSE.coffeeshop.service.EmployeeService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +30,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EmployeeServiceImpl implements EmployeeService {
     EmployeeRepository employeeRepository;
@@ -81,10 +87,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<EmployeeResponse> getAll() {
-        return employeeRepository.findAll()
-                .stream().map(employeeMapper::toEmployeeResponse)
-                .toList();
+    public PageResponse<EmployeeResponse> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        var pageData = employeeRepository.findAll(pageable);
+        log.info("Page data: {}", pageData);
+
+        return PageResponse.<EmployeeResponse>builder()
+                .currentPage(page)
+                .pageSize(pageData.getSize())
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream().map(employeeMapper::toEmployeeResponse).toList())
+                .build();
     }
 
     @Override

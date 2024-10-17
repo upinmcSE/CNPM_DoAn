@@ -108,10 +108,10 @@ public class ProductController {
         }
     }
 
-    @PutMapping("/update-info/{productId}")
+    @PutMapping(value = "/update-info/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponse> updateInfo(
             @PathVariable("productId") String productId,
-            @RequestBody ProductRequest request
+            @ModelAttribute ProductRequest request
     ) {
         ProductResponse productResponse = productService.updateInfo(productId, request);
         return ResponseEntity.ok(productResponse);
