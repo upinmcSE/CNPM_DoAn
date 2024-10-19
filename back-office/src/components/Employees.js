@@ -8,7 +8,11 @@ import {
     TableRow, 
     TableCell, 
     IconButton, 
-    TextField
+    TextField,
+    MenuItem,
+    Select,
+    FormControl,
+    InputLabel
 } from "@mui/material";
 import { Colors } from '../styles/theme';
 import EditIcon from '@mui/icons-material/Edit';
@@ -260,24 +264,30 @@ function Employees() {
                                     </ErrorMessage>
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <Field 
-                                        as={TextField}
-                                        name='gender'
-                                        label='Giới tính'
-                                        required
-                                        fullWidth
-                                    />
+                                    <FormControl fullWidth required>
+                                        <InputLabel id="gender-label">Giới tính</InputLabel>
+                                        <Field
+                                            as={Select}
+                                            name="gender"
+                                            labelId="gender-label"
+                                            label="Giới tính"
+                                        >
+                                            <MenuItem value={0}>Nam</MenuItem>
+                                            <MenuItem value={1}>Nữ</MenuItem>
+                                        </Field>
+                                    </FormControl>
                                     <ErrorMessage name='gender' >
                                         {(msg) => <Typography color="red">{msg}</Typography>}
                                     </ErrorMessage>
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <Field 
+                                    <Field
                                         as={TextField}
                                         name='employeeLv'
                                         label='Level'
                                         required
                                         fullWidth
+                                    
                                     />
                                     <ErrorMessage name='employeeLv' >
                                         {(msg) => <Typography color="red">{msg}</Typography>}

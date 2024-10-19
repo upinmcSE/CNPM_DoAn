@@ -62,12 +62,13 @@ public class ProductController {
         return ResponseEntity.ok(productResponse);
     }
 
-    @GetMapping("/getall-by-category")
+    @GetMapping("/category")
     public ResponseEntity<PageResponse<ProductResponse>> getProductByCategory(
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "9") int size,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size,
             @RequestParam(value = "category") String category
     ) {
+        log.info("Category: " + category);
         PageResponse<ProductResponse> productResponse = productService.getCategoryProduct(page, size, category);
         return ResponseEntity.ok(productResponse);
     }
