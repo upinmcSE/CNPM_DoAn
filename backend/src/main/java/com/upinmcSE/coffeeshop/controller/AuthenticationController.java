@@ -1,10 +1,7 @@
 package com.upinmcSE.coffeeshop.controller;
 
 import com.nimbusds.jose.JOSEException;
-import com.upinmcSE.coffeeshop.dto.request.AuthenticationRequest;
-import com.upinmcSE.coffeeshop.dto.request.IntrospectRequest;
-import com.upinmcSE.coffeeshop.dto.request.LogoutRequest;
-import com.upinmcSE.coffeeshop.dto.request.RefreshRequest;
+import com.upinmcSE.coffeeshop.dto.request.*;
 import com.upinmcSE.coffeeshop.dto.response.AuthenticationResponse;
 import com.upinmcSE.coffeeshop.dto.response.IntrospectResponse;
 import com.upinmcSE.coffeeshop.dto.response.SuccessResponse;
@@ -57,6 +54,14 @@ public class AuthenticationController {
     SuccessResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
         authenticationService.logout(request);
         return SuccessResponse.<Void>builder().build();
+    }
+
+    @PostMapping("/change-password")
+    public SuccessResponse<Void> changePassword(@RequestBody ChangePasswordRequest request) {
+        authenticationService.changePassword(request);
+        return SuccessResponse.<Void>builder()
+                .message("Chang password successfully")
+                .build();
     }
 
 }

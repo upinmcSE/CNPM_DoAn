@@ -80,5 +80,24 @@ const register = async (username, password, rePassword) => {
 };
 
 
+const changePassword = async (oldPassword, newPassword) => {
+    try{
+        console.log("oldPassword: ", oldPassword, "newPassword: ", newPassword)
+        var response = await axiosClient.post('/authentication/change-password', {oldPassword, newPassword}, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+                'Content-Type': 'application/json',
+            }
+        });
+        return response.data
+    }catch(error){
+        console.error("Change password error: ", error);
+        return {
+            success: false,
+            message: error.response?.data?.message || "Có lỗi xảy ra khi đổi mật khẩu"
+        };
+    }
+}
 
-export { login, logout, register };
+
+export { login, logout, register, changePassword };

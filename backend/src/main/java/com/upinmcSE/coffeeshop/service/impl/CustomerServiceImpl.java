@@ -21,6 +21,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -86,6 +87,15 @@ public class CustomerServiceImpl implements CustomerService {
                 .totalElements(pageData.getTotalElements())
                 .data(pageData.getContent().stream().map(customerMapper::toCustomerResponse).toList())
                 .build();
+    }
+
+    @Override
+    public CustomerResponse getById() {
+        var context = SecurityContextHolder.getContext();
+        var username = context.getAuthentication().getName();
+        var customer = customerRepository.findByUsername(username).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+        return customerMapper.toCustomerResponse(customer);
     }
 
     @Override

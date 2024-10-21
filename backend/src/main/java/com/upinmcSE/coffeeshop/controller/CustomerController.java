@@ -36,4 +36,9 @@ public class CustomerController {
     public ResponseEntity<CustomerResponse> updateLevel(@PathVariable String id){
         return ResponseEntity.ok().body(customerService.updateLevel(id));
     }
+
+    @GetMapping("/get")
+    public ResponseEntity<CustomerResponse> getById(){
+        return ResponseEntity.ok().body(customerService.getById());
+    }
 }

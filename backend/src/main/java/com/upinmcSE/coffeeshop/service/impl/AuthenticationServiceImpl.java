@@ -5,10 +5,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import com.upinmcSE.coffeeshop.dto.request.AuthenticationRequest;
-import com.upinmcSE.coffeeshop.dto.request.IntrospectRequest;
-import com.upinmcSE.coffeeshop.dto.request.LogoutRequest;
-import com.upinmcSE.coffeeshop.dto.request.RefreshRequest;
+import com.upinmcSE.coffeeshop.dto.request.*;
 import com.upinmcSE.coffeeshop.dto.response.AuthenticationResponse;
 import com.upinmcSE.coffeeshop.dto.response.IntrospectResponse;
 import com.upinmcSE.coffeeshop.entity.InvalidatedToken;
@@ -25,6 +22,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -106,6 +104,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void logout(LogoutRequest request) {
 
+    }
+
+    @Override
+    public void changePassword(ChangePasswordRequest request) {
+        var context = SecurityContextHolder.getContext();
+        String username = context.getAuthentication().getName();
+        var customer = customerRepository.findByUsername(username).orElseThrow(() ->
+                new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+        log.info("password: {}", request.oldPassword());
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        if(!passwordEncoder.matches(request.oldPassword(), customer.getPassword())){
+            throw new ErrorException(ErrorCode.NOT_MATCH_PW);
+        }
+        customer.setPassword(passwordEncoder.encode(request.newPassword()));
+        customerRepository.saveAndFlush(customer);
     }
 
     @Override

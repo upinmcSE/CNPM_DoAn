@@ -6,6 +6,7 @@ import Login from "../Login/Login"; // Cập nhật đường dẫn nếu cần
 import { getCart } from "../../services/cartManager";
 import ProductListDialog from "../ProductListDialog/ProductListDialog";
 import Profile from "../Profile/Profile";
+import ChangePassword from "../ChangePassword/ChangePassword";
 
 const Menu = [
   { id: 1, name: "Home", link: "/#" },
@@ -21,6 +22,10 @@ const Navbar = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false); // State để mở dialog login
   const [isCartDialogOpen, setIsCartDialogOpen] = useState(false); // State để mở dialog giỏ hàng
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+
+
+
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     setShowDropdown(true); // Hiện dropdown sau khi đăng nhập thành công
@@ -56,6 +61,14 @@ const Navbar = () => {
   const handleProfileClose = () => {
     setIsProfileOpen(false); // Đóng dialog profile
   };
+
+  const handleChangePassword = () => {
+    setIsPasswordDialogOpen(true); // Mở dialog đổi mật khẩu
+    setShowDropdown(false);
+  };
+
+  const handleCloseChangePassword = () => setIsPasswordDialogOpen(false); // Đóng dialog đổi mật khẩu
+
 
   const cartItems = getCart(); // Lấy sản phẩm trong giỏ hàng
 
@@ -106,16 +119,26 @@ const Navbar = () => {
               </button>
 
               {isLoggedIn && showDropdown && (
-                <div className="absolute right-0 mt-2 bg-white text-black rounded shadow-lg">
-                  <button className="block px-4 py-2" onClick={handleProfile}>
-                    Profile
-                  </button>
-                  <button className="block px-4 py-2" onClick={handleLogout}>
-                    Logout
-                  </button>
+                <div className="relative">
+                  <div
+                    className="absolute right-0 mt-2 bg-white text-black rounded shadow-lg z-10"
+                    style={{ pointerEvents: 'auto' }} // Đảm bảo dropdown nhận sự kiện chuột
+                    onClick={(e) => e.stopPropagation()} // Ngăn sự kiện lan ra ngoài
+                  >
+                    <button className="inline-block px-4 py-2" onClick={handleProfile}>
+                      Profile
+                    </button>
+                    <button className="inline-block px-4 py-2" onClick={handleChangePassword}>
+                      Password
+                    </button>
+                    <button className="inline-block px-4 py-2" onClick={handleLogout}>
+                      Logout
+                    </button>
+                  </div>
                 </div>
               )}
-            
+
+
             </div>
           </div>
         </div>
@@ -146,6 +169,15 @@ const Navbar = () => {
           onClose={handleCloseCartDialog}
         />
       )}
+      {/* Dialog đổi mật khẩu */}
+      <ChangePassword
+        isOpen={isPasswordDialogOpen}
+        onClose={handleCloseChangePassword}
+        onSubmit={(data) => {
+          console.log("Dữ liệu đổi mật khẩu:", data);
+          handleCloseChangePassword(); // Đóng dialog sau khi đổi mật khẩu
+        }}
+      />
 
       <Login
         isOpen={isLoginOpen}
