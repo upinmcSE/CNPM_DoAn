@@ -98,7 +98,7 @@ const Products = () => {
                 data-aos="fade-up"
                 data-aos-delay="100"
               >
-                <img src={product.img} alt={product.name} className="w-full h-40 object-cover mb-2 rounded-lg" />
+                <img src={`http://localhost:8081/coffee/api/v1/products/images/${product.urlImage}`} alt={product.name} className="w-full h-40 object-cover mb-2 rounded-lg" />
                 <h3 className="font-semibold text-lg text-center group-hover:text-primary">{product.name}</h3>
                 <p className="text-gray-500 text-center">{product.description}</p>
                 <p className="text-gray-500 text-center group-hover:text-white transition-colors duration-300">{product.price} VNĐ</p>

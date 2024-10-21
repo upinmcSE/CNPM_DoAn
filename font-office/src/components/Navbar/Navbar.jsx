@@ -5,6 +5,7 @@ import { IoMdLogIn } from "react-icons/io";
 import Login from "../Login/Login"; // Cập nhật đường dẫn nếu cần
 import { getCart } from "../../services/cartManager";
 import ProductListDialog from "../ProductListDialog/ProductListDialog";
+import Profile from "../Profile/Profile";
 
 const Menu = [
   { id: 1, name: "Home", link: "/#" },
@@ -19,7 +20,7 @@ const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false); // State để mở dialog login
   const [isCartDialogOpen, setIsCartDialogOpen] = useState(false); // State để mở dialog giỏ hàng
-
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     setShowDropdown(true); // Hiện dropdown sau khi đăng nhập thành công
@@ -45,6 +46,15 @@ const Navbar = () => {
 
   const handleCloseCartDialog = () => {
     setIsCartDialogOpen(false); // Đóng dialog giỏ hàng
+  };
+
+  const handleProfile = () => {
+    setIsProfileOpen(true); // Mở dialog profile
+    setShowDropdown(false); // Đóng dropdown khi mở dialog profile
+  };
+
+  const handleProfileClose = () => {
+    setIsProfileOpen(false); // Đóng dialog profile
   };
 
   const cartItems = getCart(); // Lấy sản phẩm trong giỏ hàng
@@ -97,15 +107,37 @@ const Navbar = () => {
 
               {isLoggedIn && showDropdown && (
                 <div className="absolute right-0 mt-2 bg-white text-black rounded shadow-lg">
+                  <button className="block px-4 py-2" onClick={handleProfile}>
+                    Profile
+                  </button>
                   <button className="block px-4 py-2" onClick={handleLogout}>
                     Logout
                   </button>
                 </div>
               )}
+            
             </div>
           </div>
         </div>
       </div>
+
+      {/* Dialog profile */}
+      <Profile
+        isOpen={isProfileOpen}
+        onClose={handleProfileClose}
+        userInfo={{
+          fullName: "Nguyễn Văn A", // Thay thế bằng thông tin thực tế
+          gender: "male",
+          age: 30,
+          email: "nguyenvana@example.com",
+          memberLevel: "Gold",
+          purchasePoints: 1500,
+        }}
+        onUpdate={(updatedData) => {
+          console.log("Thông tin người dùng đã được cập nhật:", updatedData);
+          handleProfileClose(); // Đóng dialog sau khi cập nhật
+        }}
+      />
 
       {/* Dialog giỏ hàng */}
       {isCartDialogOpen && (

@@ -9,7 +9,7 @@ import Footer from "./components/Footer/Footer.jsx";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Products from "./components/Products/Products.jsx";
-
+import { ToastProvider } from "./context/ToastContext.jsx";
 
 const App = () => {
   React.useEffect(() => {
@@ -24,14 +24,16 @@ const App = () => {
 
   return (
     <div className="bg-white dark:bg-gray-900 dark:text-white duration-200 overflow-x-hidden">
-      <Navbar />
-      <Hero />
-      <Services />
-      <Products />
-      <Banner />
-      <AppStore />
-      <Testimonials />
-      <Footer />
+      <ToastProvider>
+        <Navbar />
+        <Hero />
+        <Services />
+        <Products />
+        <Banner />
+        <AppStore />
+        <Testimonials />
+        <Footer />
+      </ToastProvider>
     </div>
   );
 };

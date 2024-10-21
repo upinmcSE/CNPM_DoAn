@@ -10,10 +10,6 @@ public class CustomerMapper {
     public Customer toCustomer(CustomerRequest request){
         return Customer.builder()
                 .username(request.username())
-                .fullName(request.fullName())
-                .email(request.email())
-                .age(request.age())
-                .gender(request.gender())
                 .build();
     }
 
