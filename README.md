@@ -6,6 +6,7 @@
 
 - Design : Figma
 - Frontend : ReactJS
+- Mobile App: Flutter
 - Backend : Java (Framework : Spring-boot-3)
 - Database : Mysql
 - Testing : Mockito
