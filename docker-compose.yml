@@ -25,6 +25,16 @@ services:
       - coffee-shop
     restart: unless-stopped
 
+  redis:
+    image: redis:latest
+    container_name: cf_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis:/data
+    networks:
+        - coffee-shop
+    restart: unless-stopped
 
 networks:
   coffee-shop:
@@ -33,3 +43,4 @@ networks:
 volumes:
   mysql:
   phpmyadmin:
+  redis:

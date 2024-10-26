@@ -1,8 +1,11 @@
 package com.upinmcSE.coffeeshop.service.impl;
 
+import com.upinmcSE.coffeeshop.dto.request.OrderLineRequest;
 import com.upinmcSE.coffeeshop.dto.request.OrderRequest;
 import com.upinmcSE.coffeeshop.dto.response.OrderResponse;
 import com.upinmcSE.coffeeshop.entity.*;
+import com.upinmcSE.coffeeshop.exception.ErrorCode;
+import com.upinmcSE.coffeeshop.exception.ErrorException;
 import com.upinmcSE.coffeeshop.mapper.OrderMapper;
 import com.upinmcSE.coffeeshop.repository.*;
 import com.upinmcSE.coffeeshop.service.OrderService;
@@ -23,39 +26,62 @@ public class OrderServiceImpl implements OrderService {
     OrderLineRepository orderLineRepository;
     OrderMapper orderMapper;
     CustomerRepository customerRepository;
-
+    CacheServiceImpl cacheService;
+    ProductRepository productRepository;
 
     @Override
-    public OrderResponse add(OrderRequest request) {
+    public String createEmptyOrder(String customerId) {
+        Order order = new Order();
+        Customer customer = customerRepository.findById(customerId).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
 
-        Customer customer = customerRepository.findById(request.customerId()).orElseThrow(
-                () -> new RuntimeException("Not found customer"));
+        order.setCustomer(customer);
+        order.setTotalPrice(0.0);
 
-        List<OrderLine> orderLines = orderLineRepository.findAllById(request.orderLines());
+        return String.valueOf(System.currentTimeMillis());
 
-        double total = 0;
 
-        for (OrderLine items : orderLines){
-            total += (items.getAmount() * items.getProduct().getPrice());
+    }
+
+    @Override // Thêm OrderLine vào Order trong Redis
+    public void addOrderLineToOrder(String orderId, OrderLineRequest orderLine) {
+        Order order = cacheService.getOrderFromCache(orderId);
+        Product product = productRepository.findById(orderLine.productId()).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_PRODUCT));
+
+        if (order != null){
+            order.getOrderLines().add(OrderLine.builder()
+                            .product(product)
+                            .amount(orderLine.amount())
+                    .build());
+            // Cập nhật tổng số tiền
+            double updatedTotal = order.getOrderLines().stream()
+                    .map(line -> line.getAmount() * line.getProduct().getPrice())
+                    .reduce(0.0, Double::sum);
+            order.setTotalPrice(updatedTotal);
+            // Lưu lại Order vào Redis
+            cacheService.saveOrderToCache(orderId, order);
+        } else {
+            throw new ErrorException(ErrorCode.NOT_FOUND_ORDER);
         }
-
-        Order order = Order.builder()
-                .customer(customer)
-                .orderLines(orderLines)
-                .totalPrice(total)
-                .build();
-        order = orderRepository.save(order);
-
-        for(OrderLine orderLine: orderLines){
-            orderLine.setOrder(order);
-            orderLineRepository.saveAndFlush(orderLine);
-        }
-
-        return orderMapper.toOrderResponse(order);
     }
 
     @Override
     public List<OrderResponse> getAllByDay(LocalDate day) {
-        return null;
+        return List.of();
     }
+
+    @Override
+    public List<OrderResponse> getAllByMonth(LocalDate month) {
+        return List.of();
+    }
+
+    @Override
+    public List<OrderResponse> getAllByYear(LocalDate year) {
+        return List.of();
+    }
+
+
+
+
 }
