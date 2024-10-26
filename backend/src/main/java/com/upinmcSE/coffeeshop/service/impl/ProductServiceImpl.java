@@ -5,16 +5,16 @@ import com.upinmcSE.coffeeshop.dto.response.PageResponse;
 import com.upinmcSE.coffeeshop.dto.response.ProductResponse;
 import com.upinmcSE.coffeeshop.entity.Category;
 import com.upinmcSE.coffeeshop.entity.Product;
+import com.upinmcSE.coffeeshop.entity.ProductDocument;
 import com.upinmcSE.coffeeshop.entity.ProductImage;
 import com.upinmcSE.coffeeshop.exception.ErrorCode;
 import com.upinmcSE.coffeeshop.exception.ErrorException;
+import com.upinmcSE.coffeeshop.mapper.ElasticMapper;
 import com.upinmcSE.coffeeshop.mapper.ProductMapper;
-import com.upinmcSE.coffeeshop.repository.CategoryRepository;
-import com.upinmcSE.coffeeshop.repository.OrderLineRepository;
-import com.upinmcSE.coffeeshop.repository.ProductImageRepository;
-import com.upinmcSE.coffeeshop.repository.ProductRepository;
+import com.upinmcSE.coffeeshop.repository.*;
 import com.upinmcSE.coffeeshop.service.ProductService;
 import com.upinmcSE.coffeeshop.utils.FileUtil;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -43,9 +43,11 @@ public class ProductServiceImpl implements ProductService {
     ProductImageRepository productImageRepository;
     OrderLineRepository orderLineRepository;
     FileUtil fileUtil;
+    ProductElasticSearchRepository productElasticSearchRepository;
+    ElasticMapper elasticMapper;
 
 
-
+    @Transactional
     @Override
     public ProductResponse add(ProductRequest request, MultipartFile file) throws IOException {
         // Tìm loại sản phẩm
@@ -71,8 +73,16 @@ public class ProductServiceImpl implements ProductService {
         ProductImage productImage = createProductImage(product.getId(), file);
 
         product.setProductImage(productImage);
+
+        //product = productRepository.save(product); dcm chưa giải quyết được lỗi này
+
+        // dòng bộ data sang bên elastic search
+        ProductDocument document = elasticMapper.toProductDocument(product);
+        productElasticSearchRepository.save(document);
         return productMapper.toProductResponse(product);
     }
+
+    @Transactional
     @Override
     public ProductResponse updateImage(String productId,  MultipartFile file) throws IOException {
         Product product = productRepository.findById(productId)
@@ -85,10 +95,15 @@ public class ProductServiceImpl implements ProductService {
 
         ProductImage productImage = createProductImage(productId, file);
         product.setProductImage(productImage);
+        product = productRepository.saveAndFlush(product);
+
+        // đồng bộ data sang bên elastic search
+        ProductDocument document = elasticMapper.toProductDocument(product);
+        productElasticSearchRepository.save(document);
 
         return productMapper.toProductResponse(product);
     }
-
+    @Transactional
     @Override
     public ProductResponse updateInfo(String id, ProductRequest request) {
         var product = productRepository.findById(id).orElseThrow(
@@ -100,10 +115,15 @@ public class ProductServiceImpl implements ProductService {
         Category category = categoryRepository.findByName(request.category()).orElseThrow(
                 () -> new ErrorException(ErrorCode.NOT_FOUND_CATEGORY));
         product.setCategory(category);
+        product = productRepository.saveAndFlush(product);
 
-        return productMapper.toProductResponse(productRepository.saveAndFlush(product));
+        // đồng bộ data sang bên elastic search
+        ProductDocument document = elasticMapper.toProductDocument(product);
+        productElasticSearchRepository.save(document);
+
+        return productMapper.toProductResponse(product);
     }
-
+    @Transactional
     @Override
     public PageResponse<ProductResponse> getOutstandingProduct(int page, int pageSize) {
 //        Sort sort = Sort.by("price").descending();
@@ -119,7 +139,7 @@ public class ProductServiceImpl implements ProductService {
                 .data(pageData.getContent().stream().map(productMapper::toProductResponse).toList())
                 .build();
     }
-
+    @Transactional
     @Override
     public PageResponse<ProductResponse> getProducts(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -133,7 +153,7 @@ public class ProductServiceImpl implements ProductService {
                 .data(pageData.getContent().stream().map(productMapper::toProductResponse).toList())
                 .build();
     }
-
+    @Transactional
     @Override
     public PageResponse<ProductResponse> getCategoryProduct(int page, int pageSize, String category) {
         Sort sort = Sort.by("price").descending();
@@ -155,10 +175,13 @@ public class ProductServiceImpl implements ProductService {
         return null;
     }
 
+    @Transactional
     @Override
     public void delete(String id) {
         productRepository.deleteById(id);
+        productElasticSearchRepository.deleteById(id);
     }
+
 
     private ProductImage createProductImage(String productId, MultipartFile file) throws IOException {
         // Tìm product theo productId

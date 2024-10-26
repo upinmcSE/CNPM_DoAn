@@ -17,6 +17,7 @@ import com.upinmcSE.coffeeshop.repository.EmployeeRepository;
 import com.upinmcSE.coffeeshop.repository.RoleRepository;
 import com.upinmcSE.coffeeshop.repository.WorkTimeRepository;
 import com.upinmcSE.coffeeshop.service.EmployeeService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -39,6 +40,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     EmployeeLVRepository employeeLVRepository;
     EmployeeMapper employeeMapper;
     PasswordEncoder passwordEncoder;
+
+    @Transactional
     @Override
     public EmployeeResponse add(EmployeeRequest request) {
         if(employeeRepository.existsByUsername(request.username()))
@@ -69,6 +72,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeMapper.toEmployeeResponse(employee);
     }
 
+    @Transactional
     @Override
     public EmployeeResponse update(String id, EmployeeRequest request) {
         var employee = employeeRepository.findById(id).orElseThrow(
@@ -86,6 +90,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeMapper.toEmployeeResponse(employeeRepository.saveAndFlush(employee));
     }
 
+    @Transactional
     @Override
     public PageResponse<EmployeeResponse> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -101,6 +106,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
     }
 
+    @Transactional
     @Override
     public void delete(String id) {
         employeeRepository.deleteById(id);

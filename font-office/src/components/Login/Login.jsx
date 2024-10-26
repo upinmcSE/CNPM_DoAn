@@ -6,7 +6,7 @@ import { ToastContext } from "../../context/ToastContext";
 import Cookies from "js-cookie";
 
 const Login = ({ isOpen, onClose, onLoginSuccess }) => {
-  const {toast} = useContext(ToastContext);
+  const { toast } = useContext(ToastContext);
   const [isLoading, setIsLoading] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
 
@@ -50,11 +50,13 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
   const formikRegister = useFormik({
     initialValues: {
       username: '',
+      email: '', // Add email to initial values
       password: '',
       repassword: '',
     },
     validationSchema: Yup.object({
       username: Yup.string().required('Username là bắt buộc'),
+      email: Yup.string().email('Email không hợp lệ').required('Email là bắt buộc'), // Add email validation
       password: Yup.string()
         .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
         .required('Mật khẩu là bắt buộc'),
@@ -67,8 +69,8 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
       setIsLoading(true);
 
       try {
-        const { username, password } = values;
-        const response = await register(username, password);
+        const { username, email, password } = values; // Include email
+        const response = await register(username, email, password); // Pass email to register
 
         if (response.success) {
           toast.success('Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.');
@@ -119,6 +121,24 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
                 />
                 {formikRegister.touched.username && formikRegister.errors.username && (
                   <p className="text-red-500 text-sm mt-1">{formikRegister.errors.username}</p>
+                )}
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-1 text-gray-700" htmlFor="email">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  {...formikRegister.getFieldProps('email')}
+                  className={`border border-gray-300 rounded w-full px-3 py-2 text-black ${
+                    formikRegister.touched.email && formikRegister.errors.email ? 'border-red-500' : ''
+                  }`}
+                  required
+                />
+                {formikRegister.touched.email && formikRegister.errors.email && (
+                  <p className="text-red-500 text-sm mt-1">{formikRegister.errors.email}</p>
                 )}
               </div>
 
@@ -210,16 +230,17 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
               type="submit"
               className="bg-primary text-white px-4 py-2 rounded"
             >
-              {isLoading ? 'ĐANG XỬ LÝ...' : (isRegister ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP')}
+              {isLoading ? 'Loading...' : isRegister ? 'Đăng Ký' : 'Đăng Nhập'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsRegister(!isRegister)}
+              className="text-gray-500 hover:underline"
+            >
+              {isRegister ? 'Đăng Nhập' : 'Đăng Ký'}
             </button>
           </div>
         </form>
-
-        {!isRegister && (
-          <p className="text-center mt-4 text-gray-600 cursor-pointer" onClick={() => setIsRegister(true)}>
-            Đăng ký tài khoản
-          </p>
-        )}
       </div>
     </div>
   );

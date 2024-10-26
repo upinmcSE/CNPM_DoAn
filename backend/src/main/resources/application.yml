@@ -20,6 +20,10 @@ spring:
     redis:
       host: localhost
       port: 6379
+    elasticsearch:
+      cluster-name: es_coffee_shop
+      rest:
+        uris: http://localhost:9200
 
 http:
   client:

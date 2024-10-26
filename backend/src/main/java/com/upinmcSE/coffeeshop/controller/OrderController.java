@@ -3,14 +3,19 @@ package com.upinmcSE.coffeeshop.controller;
 import com.upinmcSE.coffeeshop.dto.request.OrderLineRequest;
 import com.upinmcSE.coffeeshop.dto.request.OrderRequest;
 import com.upinmcSE.coffeeshop.dto.response.OrderResponse;
+import com.upinmcSE.coffeeshop.entity.Customer;
 import com.upinmcSE.coffeeshop.entity.Order;
 import com.upinmcSE.coffeeshop.entity.OrderLine;
+import com.upinmcSE.coffeeshop.exception.ErrorCode;
+import com.upinmcSE.coffeeshop.exception.ErrorException;
+import com.upinmcSE.coffeeshop.repository.CustomerRepository;
 import com.upinmcSE.coffeeshop.service.impl.CacheServiceImpl;
 import com.upinmcSE.coffeeshop.service.impl.OrderServiceImpl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,15 +25,19 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
     OrderServiceImpl orderService;
     CacheServiceImpl cacheService;
+    CustomerRepository customerRepository;
 //    @PostMapping("/add")
 //    public ResponseEntity<OrderResponse> create(@RequestBody OrderRequest request){
 //        return ResponseEntity.ok().body(orderService.add(request));
 //    }
 
     // Khởi tạo order rỗng
-    @PostMapping("/create/{customerId}")
-    public ResponseEntity<String> createOrder(@PathVariable String customerId) {
-        String orderId = orderService.createEmptyOrder(customerId);
+    @PostMapping("/create")
+    public ResponseEntity<String> createOrder() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Customer customer = customerRepository.findByUsername(username).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+        String orderId = orderService.createEmptyOrder(customer.getId());
         return ResponseEntity.ok(orderId);
     }
 

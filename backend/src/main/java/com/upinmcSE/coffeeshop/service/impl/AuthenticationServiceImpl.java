@@ -16,6 +16,7 @@ import com.upinmcSE.coffeeshop.repository.CustomerRepository;
 import com.upinmcSE.coffeeshop.repository.EmployeeRepository;
 import com.upinmcSE.coffeeshop.repository.InvalidatedTokenRepository;
 import com.upinmcSE.coffeeshop.service.AuthenticationService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -49,7 +50,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
 
-
+    @Transactional
     @Override
     public AuthenticationResponse customerLogin(AuthenticationRequest request) throws JOSEException,
             InvocationTargetException, NoSuchMethodException, IllegalAccessException
@@ -69,6 +70,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
+    @Transactional
     @Override
     public AuthenticationResponse employeeLogin(AuthenticationRequest request) throws JOSEException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
@@ -85,6 +87,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
+    @Transactional
     @Override
     public IntrospectResponse introspect(IntrospectRequest request) {
         var token = request.token();
@@ -101,11 +104,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
+    @Transactional
     @Override
     public void logout(LogoutRequest request) {
 
     }
 
+    @Transactional
     @Override
     public void changePassword(ChangePasswordRequest request) {
         var context = SecurityContextHolder.getContext();
@@ -121,6 +126,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         customerRepository.saveAndFlush(customer);
     }
 
+    @Transactional
     @Override
     public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException,
             JOSEException, InvocationTargetException, NoSuchMethodException, IllegalAccessException

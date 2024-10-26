@@ -8,18 +8,18 @@ const ProductDialog = ({ product, onClose, onBuy }) => {
     const value = Math.max(1, parseInt(event.target.value) || 1);
     setQuantity(value);
   };
+  console.log(product);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white rounded-lg p-4 max-w-sm w-full">
         <h2 className="text-xl font-bold mb-2">{product.name}</h2>
         <img
-          src={product.img}
+          src={`http://localhost:8081/coffee/api/v1/products/images/${product.urlImage}`}
           alt={product.name}
           className="w-full h-40 object-cover mb-2 rounded-lg"
         />
-        <p className="text-gray-500">{product.description}</p>
-        <p className="text-gray-500 font-semibold">{product.price} VND</p>
+        <p className="text-gray-500 text-center font-semibold">{product.price} VND</p>
 
         <div className="mt-4">
           <label className="block mb-1">Số lượng:</label>

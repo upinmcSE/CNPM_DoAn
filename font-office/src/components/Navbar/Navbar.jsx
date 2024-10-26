@@ -7,6 +7,8 @@ import { getCart } from "../../services/cartManager";
 import ProductListDialog from "../ProductListDialog/ProductListDialog";
 import Profile from "../Profile/Profile";
 import ChangePassword from "../ChangePassword/ChangePassword";
+import { createOrder } from "../../apis/orderService";
+
 
 const Menu = [
   { id: 1, name: "Home", link: "/#" },
@@ -26,10 +28,18 @@ const Navbar = () => {
 
 
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = async () => {
     setIsLoggedIn(true);
     setShowDropdown(true); // Hiện dropdown sau khi đăng nhập thành công
     setIsLoginOpen(false); // Đóng dialog login
+
+    try{
+      console.log(localStorage.getItem('authToken'))
+      const res = await createOrder()
+      console.log("res: ", res)
+    }catch (error) {
+      console.error("Error creating order after login: ", error);
+    }
   };
 
   const handleLogout = () => {

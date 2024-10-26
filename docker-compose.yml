@@ -35,6 +35,37 @@ services:
     networks:
         - coffee-shop
     restart: unless-stopped
+  
+  elasticsearch:
+    image: elasticsearch:8.15.2
+    container_name: elasticsearch
+    environment:
+      - node.name=es_coffee_shop
+      - cluster.name=coffee_shop
+      - discovery.type=single-node
+      - xpack.security.enabled=false  # Tắt xác thực
+      - xpack.security.enrollment.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:  
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - coffee-shop
+
+  kibana:
+    image: kibana:8.15.2
+    container_name: kibana
+    environment:
+      - node.name=kib_coffee_shop
+      - cluster.name=coffee_shop
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200  # Địa chỉ của Elasticsearch 
+    ports:
+      - "5601:5601"  
+    depends_on:
+      - elasticsearch
+    networks:
+      - coffee-shop
+
 
 networks:
   coffee-shop:
@@ -44,3 +75,5 @@ volumes:
   mysql:
   phpmyadmin:
   redis:
+  esdata:
+    driver: local

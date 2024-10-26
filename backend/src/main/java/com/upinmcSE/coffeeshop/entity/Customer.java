@@ -1,8 +1,11 @@
 package com.upinmcSE.coffeeshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 @Setter
 @Getter
@@ -11,6 +14,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@JsonIgnoreProperties({"orders"})
 public class Customer extends User{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -23,6 +27,9 @@ public class Customer extends User{
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
+
+    @OneToMany(mappedBy = "customer")
+    private List<Order> orders;
 
     Integer point;
 

@@ -8,6 +8,7 @@ import com.upinmcSE.coffeeshop.exception.ErrorException;
 import com.upinmcSE.coffeeshop.mapper.CategoryMapper;
 import com.upinmcSE.coffeeshop.repository.CategoryRepository;
 import com.upinmcSE.coffeeshop.service.CategoryService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,6 +22,8 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
     CategoryRepository categoryRepository;
     CategoryMapper categoryMapper;
+
+    @Transactional
     @Override
     public String add(CategoryRequest request) {
         if(categoryRepository.existsByName(request.categoryName()))
@@ -31,6 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.save(category).getId();
     }
 
+    @Transactional
     @Override
     public CategoryResponse update(String id, CategoryRequest request) {
         var category = categoryRepository.findById(id).orElseThrow(
@@ -39,6 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.toCategoryRespose(category);
     }
 
+    @Transactional
     @Override
     public List<CategoryResponse> getAll() {
         return categoryRepository.findAll()
@@ -46,6 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .toList();
     }
 
+    @Transactional
     @Override
     public void delete(String id) {
         var category = categoryRepository.findById(id).orElseThrow(

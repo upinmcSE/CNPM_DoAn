@@ -15,6 +15,7 @@ import com.upinmcSE.coffeeshop.repository.CustomerRepository;
 import com.upinmcSE.coffeeshop.repository.MemberLVRepository;
 import com.upinmcSE.coffeeshop.repository.RoleRepository;
 import com.upinmcSE.coffeeshop.service.CustomerService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -36,6 +37,7 @@ public class CustomerServiceImpl implements CustomerService {
     MemberLVRepository memberLVRepository;
     PasswordEncoder passwordEncoder;
 
+    @Transactional
     @Override
     public CustomerResponse add(CustomerRequest request) {
         if(customerRepository.existsByUsername(request.username()))
@@ -60,11 +62,13 @@ public class CustomerServiceImpl implements CustomerService {
         return customerMapper.toCustomerResponse(customer);
     }
 
+    @Transactional
     @Override
     public CustomerResponse update(String id, CustomerRequest request) {
         return null;
     }
 
+    @Transactional
     @Override
     public CustomerResponse updateLevel(String id) {
         Customer customer = customerRepository.findById(id).orElseThrow(
@@ -75,6 +79,7 @@ public class CustomerServiceImpl implements CustomerService {
         return customerMapper.toCustomerResponse(customer);
     }
 
+    @Transactional
     @Override
     public PageResponse<CustomerResponse> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -89,6 +94,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .build();
     }
 
+    @Transactional
     @Override
     public CustomerResponse getById() {
         var context = SecurityContextHolder.getContext();
@@ -98,8 +104,11 @@ public class CustomerServiceImpl implements CustomerService {
         return customerMapper.toCustomerResponse(customer);
     }
 
+    @Transactional
     @Override
     public void delete(String id) {
-
+        var customer = customerRepository.findById(id).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+        customerRepository.delete(customer);
     }
 }

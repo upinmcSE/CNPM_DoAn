@@ -8,6 +8,7 @@ import com.upinmcSE.coffeeshop.mapper.BannerMapper;
 import com.upinmcSE.coffeeshop.repository.BannerRepository;
 import com.upinmcSE.coffeeshop.service.BannerService;
 import com.upinmcSE.coffeeshop.utils.FileUtil;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,6 +26,8 @@ public class BannerServiceImpl implements BannerService {
     BannerRepository bannerRepository;
     FileUtil fileUtil;
     BannerMapper bannerMapper;
+
+    @Transactional
     @Override
     public BannerResponse create(MultipartFile file) throws IOException {
         // Kiểm tra file ảnh có rỗng không
@@ -57,6 +60,7 @@ public class BannerServiceImpl implements BannerService {
                 .build();
     }
 
+    @Transactional
     @Override
     public List<BannerResponse> getBanners() {
         return bannerRepository.findAll()

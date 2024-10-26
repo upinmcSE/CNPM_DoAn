@@ -9,6 +9,7 @@ import com.upinmcSE.coffeeshop.exception.ErrorException;
 import com.upinmcSE.coffeeshop.mapper.OrderMapper;
 import com.upinmcSE.coffeeshop.repository.*;
 import com.upinmcSE.coffeeshop.service.OrderService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,6 +30,7 @@ public class OrderServiceImpl implements OrderService {
     CacheServiceImpl cacheService;
     ProductRepository productRepository;
 
+    @Transactional
     @Override
     public String createEmptyOrder(String customerId) {
         Order order = new Order();
@@ -37,12 +39,17 @@ public class OrderServiceImpl implements OrderService {
 
         order.setCustomer(customer);
         order.setTotalPrice(0.0);
+        order.setCreatedDate(LocalDate.now());
+        order.setModifiedDate(LocalDate.now());
 
-        return String.valueOf(System.currentTimeMillis());
+        String orderId = String.valueOf(System.currentTimeMillis());
 
+        cacheService.saveOrderToCache(orderId, order);
+        return orderId;
 
     }
 
+    @Transactional
     @Override // Thêm OrderLine vào Order trong Redis
     public void addOrderLineToOrder(String orderId, OrderLineRequest orderLine) {
         Order order = cacheService.getOrderFromCache(orderId);
@@ -66,16 +73,19 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Transactional
     @Override
     public List<OrderResponse> getAllByDay(LocalDate day) {
         return List.of();
     }
 
+    @Transactional
     @Override
     public List<OrderResponse> getAllByMonth(LocalDate month) {
         return List.of();
     }
 
+    @Transactional
     @Override
     public List<OrderResponse> getAllByYear(LocalDate year) {
         return List.of();
