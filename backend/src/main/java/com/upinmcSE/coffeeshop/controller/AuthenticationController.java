@@ -36,6 +36,18 @@ public class AuthenticationController {
                 .build();
     }
 
+    @PostMapping("/employee-login")
+    public SuccessResponse<AuthenticationResponse> employeeLogin(
+            @RequestBody AuthenticationRequest request
+    )
+            throws JOSEException, InvocationTargetException, NoSuchMethodException, IllegalAccessException
+    {
+        return SuccessResponse.<AuthenticationResponse>builder()
+                .message("Customer login successfully")
+                .result(authenticationService.employeeLogin(request))
+                .build();
+    }
+
     @PostMapping("/introspect")
     SuccessResponse<IntrospectResponse> authenticate(@RequestBody IntrospectRequest request)
             throws ParseException, JOSEException {

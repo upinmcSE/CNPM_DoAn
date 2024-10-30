@@ -33,12 +33,12 @@ public class OrderController {
 
     // Khởi tạo order rỗng
     @PostMapping("/create")
-    public ResponseEntity<String> createOrder() {
+    public ResponseEntity<Order> createOrder() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Customer customer = customerRepository.findByUsername(username).orElseThrow(
                 () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
-        String orderId = orderService.createEmptyOrder(customer.getId());
-        return ResponseEntity.ok(orderId);
+        Order order = orderService.createEmptyOrder(customer.getId());
+        return ResponseEntity.ok().body(order);
     }
 
     // Thêm order line vào order

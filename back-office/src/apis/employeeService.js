@@ -19,16 +19,17 @@ const getEmployees = async (page=1, size = 10) => {
 const addEmployee = async (employee) => {
     try{
         const token = localStorage.getItem('token');
+        console.log("data", employee);
         const res = await axiosClient.post("/employees/add", employee, {
             headers: {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'json',
+                'Content-Type': 'application/json',
             }
         });
         console.log("Employee added successfully: ", res.data);
         return res.data;
     }catch(error){
-        console.error("Error adding employee: ", error.response ? error.response.data : error.message);
+        console.error("Error adding employeex: ", error.response ? error.response.data : error.message);
         throw error;
     }
 }
@@ -36,10 +37,12 @@ const addEmployee = async (employee) => {
 const updateEmployee = async (id, employee) => {    
     try{
         const token = localStorage.getItem('token');
-        const res = await axiosClient.put(`/employees/update-info/${id}`, employee, {
+        console.log("data1", id);
+        console.log("data2", employee);
+        const res = await axiosClient.put(`/employees/update/${id}`, employee, {
             headers: {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'json',
+                'Content-Type': 'application/json',
             }
         });
         console.log("Employee updated successfully: ", res.data);
@@ -53,7 +56,7 @@ const updateEmployee = async (id, employee) => {
 const deleteEmployee = async (id) => {      
     try{
         const token = localStorage.getItem('token');
-        const res = await axiosClient.delete(`/employees/delete/${id}`, {
+        await axiosClient.delete(`/employees/delete/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

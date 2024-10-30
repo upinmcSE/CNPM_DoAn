@@ -1,6 +1,7 @@
 package com.upinmcSE.coffeeshop.controller;
 
 import com.upinmcSE.coffeeshop.dto.request.EmployeeRequest;
+import com.upinmcSE.coffeeshop.dto.request.EmployeeUpdateRequest;
 import com.upinmcSE.coffeeshop.dto.response.EmployeeResponse;
 import com.upinmcSE.coffeeshop.dto.response.PageResponse;
 import com.upinmcSE.coffeeshop.dto.response.ProductResponse;
@@ -33,6 +34,10 @@ public class EmployeeController {
         PageResponse<EmployeeResponse> employeeResponses = employeeService.getAll(page, size);
         return ResponseEntity.ok(employeeResponses);
     }
-    
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<EmployeeResponse> update(@PathVariable String id, @RequestBody EmployeeUpdateRequest request){
+        return ResponseEntity.ok().body(employeeService.update(id, request));
+    }
 
 }

@@ -131,7 +131,7 @@ export default function NavDrawer({open, setOpen}) {
                 text={"Customers"}
                 icon={<GroupIcon />}
                 handleNavbarItemClicked={handleNavbarItemClicked}
-                selected={selectedItem.includes('Products')}
+                selected={selectedItem.includes('Customers')}
               />
             </ListItem>
             <ListItem  disablePadding>
@@ -139,7 +139,15 @@ export default function NavDrawer({open, setOpen}) {
                 text={"Employees"}
                 icon={<GroupIcon />}
                 handleNavbarItemClicked={handleNavbarItemClicked}
-                selected={selectedItem.includes('Products')}
+                selected={selectedItem.includes('Employees')}
+              />
+            </ListItem>
+            <ListItem  disablePadding>
+              <MyListItemButton
+                text={"Attendance"}
+                icon={<GroupIcon />}
+                handleNavbarItemClicked={handleNavbarItemClicked}
+                selected={selectedItem.includes('Attendance')}
               />
             </ListItem>
         </List>

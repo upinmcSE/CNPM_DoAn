@@ -2,7 +2,7 @@ import axiosClient from './axiosClient';
 
 const login = async (username, password) => {
     try {
-        const response = await axiosClient.post("/authentication/customer-login", { username, password });
+        const response = await axiosClient.post("/authentication/employee-login", { username, password });
         
         if (response.data.code === 1000 && response.data.result.authenticated) {
             // Đăng nhập thành công

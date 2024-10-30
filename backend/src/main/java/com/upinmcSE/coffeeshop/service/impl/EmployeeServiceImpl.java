@@ -1,6 +1,7 @@
 package com.upinmcSE.coffeeshop.service.impl;
 
 import com.upinmcSE.coffeeshop.dto.request.EmployeeRequest;
+import com.upinmcSE.coffeeshop.dto.request.EmployeeUpdateRequest;
 import com.upinmcSE.coffeeshop.dto.response.EmployeeResponse;
 import com.upinmcSE.coffeeshop.dto.response.PageResponse;
 import com.upinmcSE.coffeeshop.dto.response.ProductResponse;
@@ -74,12 +75,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Transactional
     @Override
-    public EmployeeResponse update(String id, EmployeeRequest request) {
+    public EmployeeResponse update(String id, EmployeeUpdateRequest request) {
         var employee = employeeRepository.findById(id).orElseThrow(
                 () -> new ErrorException(ErrorCode.NOT_FOUND_EMPLOYEE));
         employee.setFullName(request.fullName());
-        employee.setEmail(request.email());
-        employee.setAge(request.age());
         EmployeeLv employeeLv = employeeLVRepository.findByName(request.employeeLv()).orElseThrow(
                 () -> new ErrorException(ErrorCode.NOT_FOUND_EMPLOYEELV));
         employee.setEmployeeLv(employeeLv);
