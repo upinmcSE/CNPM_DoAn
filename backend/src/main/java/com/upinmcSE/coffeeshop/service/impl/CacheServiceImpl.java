@@ -1,11 +1,13 @@
 package com.upinmcSE.coffeeshop.service.impl;
 
-import com.upinmcSE.coffeeshop.entity.Order;
+import com.upinmcSE.coffeeshop.entity.OrderCache;
 import com.upinmcSE.coffeeshop.service.CacheService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+
 
 @Service
 public class CacheServiceImpl implements CacheService {
@@ -15,14 +17,24 @@ public class CacheServiceImpl implements CacheService {
 
     @Transactional
     @Override // Lưu Order vào Redis
-    public void saveOrderToCache(String orderId, Order order) {
-        redisTemplate.opsForValue().set("order:" + orderId, order);
+    public void saveOrderToCache(String orderId, OrderCache orderCache) {
+        // Không cần khởi tạo orderCache trong phương thức này nữa
+        redisTemplate.opsForValue().set("order:" + orderId, orderCache);
+        redisTemplate.opsForValue().set("order:byCustomer:" + orderCache.getCustomerId(), orderId);
     }
 
     @Transactional
     @Override // Lấy Order từ Redis
-    public Order getOrderFromCache(String orderId) {
-        return (Order) redisTemplate.opsForValue().get("order:" + orderId);
+    public OrderCache getOrderFromCache(String customerId) {
+        System.out.println(customerId);
+        var orderId = redisTemplate.opsForValue().get("order:byCustomer:" + customerId);
+        if (orderId == null) {
+            System.out.println("Order not found in Redis.");
+            return null;
+        }
+        var orderCache = redisTemplate.opsForValue().get("order:" + orderId);
+        System.out.println(orderCache);
+        return (OrderCache) orderCache;
     }
 
     @Transactional

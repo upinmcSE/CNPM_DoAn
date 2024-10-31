@@ -5,6 +5,7 @@ import com.upinmcSE.coffeeshop.dto.request.OrderRequest;
 import com.upinmcSE.coffeeshop.dto.response.OrderResponse;
 import com.upinmcSE.coffeeshop.entity.Customer;
 import com.upinmcSE.coffeeshop.entity.Order;
+import com.upinmcSE.coffeeshop.entity.OrderCache;
 import com.upinmcSE.coffeeshop.entity.OrderLine;
 import com.upinmcSE.coffeeshop.exception.ErrorCode;
 import com.upinmcSE.coffeeshop.exception.ErrorException;
@@ -26,36 +27,39 @@ public class OrderController {
     OrderServiceImpl orderService;
     CacheServiceImpl cacheService;
     CustomerRepository customerRepository;
-//    @PostMapping("/add")
-//    public ResponseEntity<OrderResponse> create(@RequestBody OrderRequest request){
-//        return ResponseEntity.ok().body(orderService.add(request));
-//    }
 
-    // Khởi tạo order rỗng
+    // Khởi tạo order
     @PostMapping("/create")
-    public ResponseEntity<Order> createOrder() {
+    public ResponseEntity<String> createOrder() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Customer customer = customerRepository.findByUsername(username).orElseThrow(
                 () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
-        Order order = orderService.createEmptyOrder(customer.getId());
-        return ResponseEntity.ok().body(order);
+        String orderId = orderService.createEmptyOrder(customer.getId());
+        return ResponseEntity.ok().body(orderId);
     }
 
     // Thêm order line vào order
     @PostMapping("/add-line/{orderId}")
     public ResponseEntity<String> addOrderLine(@PathVariable String orderId, @RequestBody OrderLineRequest orderLine) {
-        orderService.addOrderLineToOrder(orderId, orderLine);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Customer customer = customerRepository.findByUsername(username).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+        System.out.println("orderLine xx: " + orderLine);
+        orderService.addOrderLineToOrder(customer.getId(), orderLine);
         return ResponseEntity.ok("OrderLine đã được thêm vào Order.");
     }
 
     // API để xem Order từ Redis
-    @GetMapping("/{orderId}")
-    public ResponseEntity<?> viewOrder(@PathVariable String orderId) {
-        Order order = cacheService.getOrderFromCache(orderId);
+    @GetMapping("/getOrder")
+    public ResponseEntity<?> viewOrder() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Customer customer = customerRepository.findByUsername(username).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+        OrderCache orderCache = cacheService.getOrderFromCache(customer.getId());
 
-        if (order != null) {
+        if (orderCache != null) {
             // Trả về Order dưới dạng JSON
-            return ResponseEntity.ok(order);
+            return ResponseEntity.ok().body(orderCache);
         } else {
             // Trả về mã lỗi 404 nếu không tìm thấy Order
             return ResponseEntity.status(404).body("Order not found in Redis.");

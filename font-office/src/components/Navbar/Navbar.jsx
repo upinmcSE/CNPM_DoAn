@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Logo from "../../assets/website/coffee_logo.png";
 import { FaCoffee } from "react-icons/fa";
 import { IoMdLogIn } from "react-icons/io";
 import Login from "../Login/Login"; // Cập nhật đường dẫn nếu cần
-import { getCart } from "../../services/cartManager";
 import ProductListDialog from "../ProductListDialog/ProductListDialog";
 import Profile from "../Profile/Profile";
 import ChangePassword from "../ChangePassword/ChangePassword";
-import { createOrder } from "../../apis/orderService";
+import { createOrder, getCart } from "../../apis/orderService";
 
 
 const Menu = [
@@ -25,6 +24,7 @@ const Navbar = () => {
   const [isCartDialogOpen, setIsCartDialogOpen] = useState(false); // State để mở dialog giỏ hàng
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
 
 
 
@@ -36,7 +36,7 @@ const Navbar = () => {
     try{
       console.log(localStorage.getItem('authToken'))
       const res = await createOrder()
-      console.log("res: ", res)
+      console.log("res id: ", res)
     }catch (error) {
       console.error("Error creating order after login: ", error);
     }
@@ -55,8 +55,17 @@ const Navbar = () => {
     }
   };
 
-  const handleOrderClick = () => {
-    setIsCartDialogOpen(true); // Mở dialog giỏ hàng
+  const handleOrderClick = async () => {
+    console.log("Loading cart items..."); // Kiểm tra xem hàm có được gọi
+    try {
+        const cartItems = await getCart();
+        setOrderCount(cartItems.length);
+        setCartItems(cartItems);
+        console.log("cartItems: ", cartItems);
+        setIsCartDialogOpen(true); // Mở dialog giỏ hàng
+    } catch (error) {
+        console.error("Error loading cart items: ", error);
+    }
   };
 
   const handleCloseCartDialog = () => {
@@ -80,7 +89,6 @@ const Navbar = () => {
   const handleCloseChangePassword = () => setIsPasswordDialogOpen(false); // Đóng dialog đổi mật khẩu
 
 
-  const cartItems = getCart(); // Lấy sản phẩm trong giỏ hàng
 
   return (
     <div className="bg-gradient-to-r from-secondary to-secondary/90 shadow-md bg-gray-900 text-white">
@@ -179,6 +187,7 @@ const Navbar = () => {
           onClose={handleCloseCartDialog}
         />
       )}
+
       {/* Dialog đổi mật khẩu */}
       <ChangePassword
         isOpen={isPasswordDialogOpen}

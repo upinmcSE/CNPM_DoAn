@@ -26,7 +26,6 @@ import java.util.List;
 @Entity
 @Table(name = "orders")
 @EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties({"customer"})
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -42,16 +41,8 @@ public class Order {
     double totalPrice;
 
     @CreatedDate
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
     LocalDate createdDate;
 
     @LastModifiedDate
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
     LocalDate modifiedDate;
-
-
 }

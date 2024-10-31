@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { addToCart } from '../../services/cartManager'; // Import cart manager
+import { addProductToOrder } from '../../apis/orderService';
 
 const ProductDialog = ({ product, onClose, onBuy }) => {
   const [quantity, setQuantity] = useState(1);
@@ -8,6 +8,14 @@ const ProductDialog = ({ product, onClose, onBuy }) => {
     const value = Math.max(1, parseInt(event.target.value) || 1);
     setQuantity(value);
   };
+
+  const handleAddToCart = (product, quantity) => {
+    const orderline = {
+      productId: product.id,
+      amount: quantity,
+    };
+    addProductToOrder(orderline, localStorage.getItem('orderId'));
+  }
   console.log(product);
 
   return (
@@ -43,7 +51,7 @@ const ProductDialog = ({ product, onClose, onBuy }) => {
           </button>
           <button
             onClick={() => {
-              addToCart(product, quantity); // Thêm vào giỏ hàng
+              handleAddToCart(product, quantity); // Thêm vào giỏ hàng
               onClose();
             }}
             className="px-4 py-2 bg-gray-300 rounded"

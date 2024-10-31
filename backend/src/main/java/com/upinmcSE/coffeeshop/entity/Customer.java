@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Setter
@@ -14,7 +17,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@JsonIgnoreProperties({"orders"})
 public class Customer extends User{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,5 +34,6 @@ public class Customer extends User{
     private List<Order> orders;
 
     Integer point;
+
 
 }

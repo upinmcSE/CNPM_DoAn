@@ -33,15 +33,9 @@ public class User {
     boolean gender;
 
     @CreatedDate
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
     LocalDate createdDate;
 
     @LastModifiedDate
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
     LocalDate modifiedDate;
 
 
