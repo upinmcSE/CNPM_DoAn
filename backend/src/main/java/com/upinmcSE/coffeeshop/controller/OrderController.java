@@ -65,4 +65,14 @@ public class OrderController {
             return ResponseEntity.status(404).body("Order not found in Redis.");
         }
     }
+
+    // Xóa OrderLine từ Order
+    @DeleteMapping("/remove-line/{orderId}/{orderLineId}")
+    public ResponseEntity<String> removeOrderLine(@PathVariable String orderId, @PathVariable String orderLineId) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Customer customer = customerRepository.findByUsername(username).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+        orderService.removeOrderLineFromOrder(customer.getId(), orderId, orderLineId);
+        return ResponseEntity.ok("OrderLine đã được xóa khỏi Order.");
+    }
 }

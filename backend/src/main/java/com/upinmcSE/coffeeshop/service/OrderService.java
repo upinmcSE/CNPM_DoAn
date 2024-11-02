@@ -12,7 +12,7 @@ import java.util.List;
 public interface OrderService {
     String createEmptyOrder(String customerId);
     void addOrderLineToOrder(String orderId, OrderLineRequest orderLine);
-    void removeOrderLineFromOrder(String orderId, OrderLineRequest orderLine);
+    void removeOrderLineFromOrder(String customerId, String orderId, String orderLineId);
     List<OrderResponse> getAllByDay(LocalDate day);
     List<OrderResponse> getAllByMonth(LocalDate month);
     List<OrderResponse> getAllByYear(LocalDate year);

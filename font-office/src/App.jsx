@@ -1,4 +1,5 @@
 import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Hero from "./components/Hero/Hero";
 import Navbar from "./components/Navbar/Navbar";
 import Services from "./components/Services/Services.jsx";
@@ -10,6 +11,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import Products from "./components/Products/Products.jsx";
 import { ToastProvider } from "./context/ToastContext.jsx";
+import PaymentPage from "./pages/PaymentPage/PaymentPage.jsx";
 
 const App = () => {
   React.useEffect(() => {
@@ -25,14 +27,23 @@ const App = () => {
   return (
     <div className="bg-white dark:bg-gray-900 dark:text-white duration-200 overflow-x-hidden">
       <ToastProvider>
-        <Navbar />
-        <Hero />
-        <Services />
-        <Products />
-        <Banner />
-        <AppStore />
-        <Testimonials />
-        <Footer />
+        <Router>
+          <Routes>
+            <Route path="/" element={
+              <>
+                <Navbar />
+                <Hero />
+                <Services />
+                <Products />
+                <Banner />
+                <AppStore />
+                <Testimonials />
+                <Footer />
+              </>
+            } />
+            <Route path="/payment" element={<PaymentPage />} />
+          </Routes>
+        </Router>
       </ToastProvider>
     </div>
   );

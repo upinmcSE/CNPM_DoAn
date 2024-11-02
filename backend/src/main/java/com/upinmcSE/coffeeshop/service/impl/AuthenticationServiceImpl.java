@@ -107,7 +107,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     @Override
     public void logout(LogoutRequest request) {
-
+        var token = request.token();
+        try {
+            var signedJWT = verifyToken(token);
+            var jit = signedJWT.getJWTClaimsSet().getJWTID();
+            var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+            var invalidatedToken = InvalidatedToken.builder()
+                    .id(jit)
+                    .expiryTime(expiryTime)
+                    .build();
+            invalidatedTokenRepository.save(invalidatedToken);
+        } catch (ParseException | JOSEException e) {
+            e.printStackTrace();
+        }
     }
 
     @Transactional

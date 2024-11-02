@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Logo from "../../assets/website/coffee_logo.png";
 import { FaCoffee } from "react-icons/fa";
 import { IoMdLogIn } from "react-icons/io";
@@ -7,7 +7,7 @@ import ProductListDialog from "../ProductListDialog/ProductListDialog";
 import Profile from "../Profile/Profile";
 import ChangePassword from "../ChangePassword/ChangePassword";
 import { createOrder, getCart } from "../../apis/orderService";
-
+import { introspect, logout } from "../../apis/authService";
 
 const Menu = [
   { id: 1, name: "Home", link: "/#" },
@@ -20,13 +20,50 @@ const Navbar = () => {
   const [orderCount, setOrderCount] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(false); // State để mở dialog login
-  const [isCartDialogOpen, setIsCartDialogOpen] = useState(false); // State để mở dialog giỏ hàng
+  const [isLoginOpen, setIsLoginOpen] = useState(false); 
+  const [isCartDialogOpen, setIsCartDialogOpen] = useState(false); 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
 
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
 
+  useEffect(() => {
+    fetchCartItems();
+  }, [isLoggedIn]);
+
+  // Hàm kiểm tra trạng thái authentication
+  const checkAuthStatus = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      setIsLoggedIn(false);
+      return;
+    }
+    try {
+      const token = localStorage.getItem('authToken');
+      await introspect(token); // Gọi API để verify token
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.error("Token invalid or expired:", error);
+      localStorage.removeItem('authToken');
+      setIsLoggedIn(false);
+      setShowDropdown(false);
+    }
+  }
+
+  const fetchCartItems = async () => {
+    if (isLoggedIn) {
+        try {
+            const cartItems = await getCart();
+            setCartItems(cartItems); 
+            setOrderCount(cartItems.length); 
+        } catch (error) {
+            console.error("Error fetching cart items on render:", error);
+        }
+    }
+  };
 
   const handleLoginSuccess = async () => {
     setIsLoggedIn(true);
@@ -42,9 +79,15 @@ const Navbar = () => {
     }
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setShowDropdown(false);
+  const handleLogout = async () => {
+    try{
+      const res = await logout()
+      console.log("res: ", res.message)
+      setIsLoggedIn(false);
+      setShowDropdown(false);
+    }catch (error) {
+      console.error("Error creating order after login: ", error);
+    }
   };
 
   const handleLoginClick = () => {
@@ -56,8 +99,12 @@ const Navbar = () => {
   };
 
   const handleOrderClick = async () => {
-    console.log("Loading cart items..."); // Kiểm tra xem hàm có được gọi
     try {
+        // Kiểm tra đăng nhập trước khi lấy giỏ hàng
+        if (!isLoggedIn) {
+          setIsLoginOpen(true);
+          return;
+        }
         const cartItems = await getCart();
         setOrderCount(cartItems.length);
         setCartItems(cartItems);
@@ -91,7 +138,7 @@ const Navbar = () => {
 
 
   return (
-    <div className="bg-gradient-to-r from-secondary to-secondary/90 shadow-md bg-gray-900 text-white">
+    <div className="bg-gradient-to-r from-secondary to-secondary/90 shadow-md bg-gray-900 text-white fixed top-0 left-0 right-0 z-50">
       <div className="container py-2">
         <div className="flex justify-between items-center">
           <a

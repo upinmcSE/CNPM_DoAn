@@ -6,12 +6,12 @@ const axiosClient = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-})
+});
 
-// Set interceptor cho axiosClient instance
+// Thiết lập interceptor cho Axios
 axiosClient.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken');
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`;
         }
@@ -22,21 +22,5 @@ axiosClient.interceptors.request.use(
     }
 );
 
-// Thêm response interceptor để xử lý lỗi
-axiosClient.interceptors.response.use(
-    (response) => {
-        return response;
-    },
-    (error) => {
-        // Log chi tiết lỗi
-        console.error('API Error:', error);
-        if (error.response) {
-            // Log response status và data
-            console.error('Status:', error.response.status);
-            console.error('Data:', error.response.data);
-        }
-        return Promise.reject(error);
-    }
-);
 
 export default axiosClient;

@@ -107,26 +107,31 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public void removeOrderLineFromOrder(String orderId, OrderLineRequest orderLine) {
-        OrderCache orderCache = cacheService.getOrderFromCache(orderId);
-        if(orderCache == null){
+    public void removeOrderLineFromOrder(String customerID, String orderId, String orderLineId) {
+        // Lấy Order từ cache
+        OrderCache orderCache = cacheService.getOrderFromCache(customerID);
+
+        // Kiểm tra nếu Order không tồn tại
+        if (orderCache == null) {
             throw new ErrorException(ErrorCode.NOT_FOUND_ORDER);
         }
 
+        // Tìm OrderLine cần xóa theo orderLineId
         OrderLineCache orderLineToRemove = orderCache.getOrderLineCaches().stream()
-                .filter(line -> line.getProduct().getId().equals(orderLine.productId()))
+                .filter(line -> line.getId().equals(orderLineId))
                 .findFirst()
                 .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_ORDER_LINE));
 
+        // Xóa OrderLine khỏi danh sách
         orderCache.getOrderLineCaches().remove(orderLineToRemove);
 
+        // Tính toán lại tổng giá trị của Order sau khi xóa OrderLine
         double updatedTotal = orderCache.getOrderLineCaches().stream()
-                .map(line -> line.getProduct().getPrice() * line.getAmount())
-                .reduce(0.0, Double::sum);
+                .mapToDouble(line -> line.getProduct().getPrice() * line.getAmount())
+                .sum();
         orderCache.setTotalPrice(updatedTotal);
 
-
-        // Save the updated Order back to Redis
+        // Lưu lại Order đã cập nhật vào cache
         cacheService.saveOrderToCache(orderId, orderCache);
     }
 

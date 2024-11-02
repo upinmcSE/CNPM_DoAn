@@ -4,6 +4,7 @@ import Products from './components/Products'
 import Customers from './components/Customers'
 import Employees from './components/Employees'
 import Attendance from './components/Attendance'
+
 export default function AppRoutes() {
     return(
         <Routes>

@@ -28,6 +28,7 @@ public class SecurityConfig {
         "/api/v1/authentication/customer-login",
             "/api/v1/authentication/employee-login",
             "/api/v1/authentication/logout",
+            "/api/v1/authentication/introspect",
             "api/v1/customers/add",
             "api/v1/payment/vn-pay-callback",
             "/api/v1/products/outstanding",

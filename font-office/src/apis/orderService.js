@@ -64,9 +64,16 @@ const getCart = async () => {
     }
 };
 
-const removeItemFromOrder = async (orderId, productId) => {
+const removeItemFromOrder = async (orderId, orderLineId) => {
     try{
         const token = localStorage.getItem('authToken');
+        const res = await axiosClient.delete(`/orders/remove-line/${orderId}/${orderLineId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+        console.log("res: ", res);
     }catch(error){
         console.error("Error removing product from order: ", error);
         throw error;

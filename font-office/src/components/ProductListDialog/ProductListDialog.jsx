@@ -1,10 +1,36 @@
-import React from 'react';
-import { removeItemFromOrder } from '../../apis/orderService';
+import React, {useState, useEffect } from 'react';
+import { removeItemFromOrder, getCart } from '../../apis/orderService';
+import { useNavigate } from 'react-router-dom';
 const ProductListDialog = ({ cartItems, onClose}) => {
   console.log("cartItems: ", cartItems);
+  const [Items, setItems] = useState(cartItems);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setItems(cartItems); // Update the Items state whenever cartItems prop changes
+  }, [cartItems]);
   
-  const handleRemoveFromCart = (productId) => {}
-  const handleCheckout = () => {}
+  const loadItems = async () => {
+    try{
+      const Items = await getCart();
+      setItems(Items);
+    }catch(error){
+      console.error("Error loading cart items: ", error);
+    }
+  }
+  const handleRemoveFromCart = async (orderLineId) => {
+    try{
+      const orderId = localStorage.getItem('orderId');
+      await removeItemFromOrder(orderId, orderLineId);
+      loadItems();
+    }catch(error){
+      console.error("Error removing product from order: ", error);
+      throw error;
+    }
+  }
+  const handleCheckout = () => {
+    navigate('/payment');
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -16,11 +42,11 @@ const ProductListDialog = ({ cartItems, onClose}) => {
           &times;
         </button>
         <h2 className="text-2xl font-bold mb-4">Giỏ hàng của bạn</h2>
-        {cartItems.length === 0 ? (
+        {Items.length === 0 ? (
           <p className="text-gray-500">Giỏ hàng của bạn đang trống.</p>
         ) : (
           <ul className="space-y-4">
-            {cartItems.map((item) => (
+            {Items.map((item) => (
               <li key={item.id} className="flex justify-between items-center p-2 border-b border-gray-300">
                 <div>
                   <h3 className="font-semibold text-gray-500">Tên sản phẩm: {item.product.name}</h3>
@@ -38,8 +64,11 @@ const ProductListDialog = ({ cartItems, onClose}) => {
           </ul>
         )}
         
-        {cartItems.length > 0 && (
+        {Items.length > 0 && (
           <div className="mt-4 flex justify-between">
+            <p className="font-semibold text-gray-500">
+              Tổng cộng: {Items.reduce((acc, item) => acc + item.product.price * item.amount, 0).toLocaleString('vi-VN')} VND
+            </p>
             <button
               onClick={handleCheckout}
               className="bg-primary text-white px-6 py-3 rounded-full hover:bg-primary/80 transition duration-200"

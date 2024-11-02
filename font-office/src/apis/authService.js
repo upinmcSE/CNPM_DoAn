@@ -33,7 +33,11 @@ const login = async (username, password) => {
 
 const logout = async (token) => {
     try {
-        const response = await axiosClient.post('/authentication/logout', { token });
+        var response = await axiosClient.post('/authentication/logout', { token: `Bearer ${token}` }, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
 
         if (response.data.code !== 1000) {
             throw new Error('Logout failed');
@@ -99,5 +103,22 @@ const changePassword = async (oldPassword, newPassword) => {
     }
 }
 
+const introspect = async ({token}) => {
+    try{
+        var response = await axiosClient.post('/authentication/introspect', { token: `Bearer ${token}` }, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        return response.data
+    }catch(error){
+        console.error("Introspect error: ", error);
+        return {
+            success: false,
+            message: error.response?.data?.message || "Có lỗi xảy ra khi introspect"
+        };
+    }
+}
 
-export { login, logout, register, changePassword };
+
+export { login, logout, register, changePassword, introspect };

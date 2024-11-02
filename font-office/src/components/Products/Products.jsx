@@ -71,7 +71,7 @@ const Products = () => {
   return (
     <>
       <span id="products"></span>
-      <div className="flex bg-slate-200">
+      <div className="flex bg-slate-200 ">
         {/* Sidebar */}
         <div className="w-1/4 bg-gray-400 p-4">
           <h2 className="font-bold text-center text-lg text-amber-800 mb-4">Chọn loại sản phẩm</h2>
