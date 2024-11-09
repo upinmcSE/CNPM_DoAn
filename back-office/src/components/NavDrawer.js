@@ -150,6 +150,14 @@ export default function NavDrawer({open, setOpen}) {
                 selected={selectedItem.includes('Attendance')}
               />
             </ListItem>
+            <ListItem  disablePadding>
+              <MyListItemButton
+                text={"Inventory"}
+                icon={<GroupIcon />}
+                handleNavbarItemClicked={handleNavbarItemClicked}
+                selected={selectedItem.includes('Inventory')}
+              />
+            </ListItem>
         </List>
         <Divider />
       </Drawer>

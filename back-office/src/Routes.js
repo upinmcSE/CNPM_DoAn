@@ -14,6 +14,7 @@ export default function AppRoutes() {
             <Route exact path='/customers' element={<Customers />} />
             <Route exact path='/employees' element={<Employees />} />
             <Route exact path='/attendance' element={<Attendance />} />
+            {/* <Route exact path='/inventory' element={<Inventory />} /> */}
         </Routes>
     )
 }

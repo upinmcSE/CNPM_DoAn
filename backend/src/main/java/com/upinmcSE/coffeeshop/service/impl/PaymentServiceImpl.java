@@ -2,8 +2,10 @@ package com.upinmcSE.coffeeshop.service.impl;
 
 import com.upinmcSE.coffeeshop.configuration.momo.MoMoConfig;
 import com.upinmcSE.coffeeshop.configuration.vnpay.VNPAYConfig;
+import com.upinmcSE.coffeeshop.dto.request.PaymentInfo;
 import com.upinmcSE.coffeeshop.dto.response.PaymentResponse;
 import com.upinmcSE.coffeeshop.entity.Order;
+import com.upinmcSE.coffeeshop.entity.OrderCache;
 import com.upinmcSE.coffeeshop.entity.Payment;
 import com.upinmcSE.coffeeshop.exception.ErrorCode;
 import com.upinmcSE.coffeeshop.exception.ErrorException;
@@ -29,19 +31,19 @@ public class PaymentServiceImpl implements PaymentService {
     PaymentRepository paymentRepository;
     VNPAYConfig vnpayConfig;
     MoMoConfig moMoConfig;
-    @Override
-    public PaymentResponse createPaymentVNPAY(HttpServletRequest request) {
-        Order order = orderRepository.findById(request.getParameter("orderId")).orElseThrow(
-                () -> new ErrorException(ErrorCode.NOT_FOUND_ORDER)
-        );
+    CacheServiceImpl cacheService;
 
-        long amount = Math.round(order.getTotalPrice() * 100L);
+    @Override
+    public PaymentResponse createPaymentVNPAY(String customerId, HttpServletRequest request, PaymentInfo paymentInfo) {
+        OrderCache orderCache = cacheService.getOrderFromCache(customerId);
+
+        long amount = Math.round(orderCache.getTotalPrice() * 100L);
 //        System.out.println(Math.round(order.getTotalPrice()));
 //        System.out.println(amount);
         String bankCode = "NCB";
 
         Map<String, String> vnpParamsMap = vnpayConfig.getVNPayConfig();
-        vnpParamsMap.put("vnp_OrderInfo", "Thanh toan don hang: "+ order.getId());
+        vnpParamsMap.put("vnp_OrderInfo", "Thanh toan don hang: "+ orderCache.getId());
         vnpParamsMap.put("vnp_Amount", String.valueOf(amount));
         vnpParamsMap.put("vnp_BankCode", bankCode);
         vnpParamsMap.put("vnp_IpAddr", VNPayUtil.getIpAddress(request));

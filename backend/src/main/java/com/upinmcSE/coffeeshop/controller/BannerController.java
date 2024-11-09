@@ -50,7 +50,6 @@ public class BannerController {
                 return ResponseEntity.ok()
                         .contentType(MediaType.IMAGE_JPEG)
                         .body(new UrlResource(Paths.get("uploads/notfound.jpeg").toUri()));
-                //return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
             log.error("Error occurred while retrieving image: " + e.getMessage());

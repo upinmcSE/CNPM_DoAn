@@ -1,15 +1,19 @@
 package com.upinmcSE.coffeeshop.controller;
 
+import com.upinmcSE.coffeeshop.dto.request.PaymentInfo;
 import com.upinmcSE.coffeeshop.dto.response.PaymentResponse;
-import com.upinmcSE.coffeeshop.dto.response.ResponseObject;
 import com.upinmcSE.coffeeshop.dto.response.SuccessResponse;
-import com.upinmcSE.coffeeshop.dto.response.VNPayResponse;
+import com.upinmcSE.coffeeshop.entity.Customer;
+import com.upinmcSE.coffeeshop.exception.ErrorCode;
+import com.upinmcSE.coffeeshop.exception.ErrorException;
+import com.upinmcSE.coffeeshop.repository.CustomerRepository;
 import com.upinmcSE.coffeeshop.service.impl.PaymentServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,12 +26,23 @@ import java.util.Map;
 public class PaymentController {
     RestTemplate restTemplate = new RestTemplate();
     PaymentServiceImpl paymentService;
+    CustomerRepository customerRepository;
 
     @GetMapping("/vn-pay")
-    public SuccessResponse<PaymentResponse> pay(HttpServletRequest request){
+    public SuccessResponse<PaymentResponse> pay(
+            HttpServletRequest request,
+            @RequestParam String phone,
+            @RequestParam String address
+    ) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Customer customer = customerRepository.findByUsername(username).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
         return SuccessResponse.<PaymentResponse>builder()
                 .message("Payment successfully !!")
-                .result(paymentService.createPaymentVNPAY(request))
+                .result(paymentService.createPaymentVNPAY(customer.getId(), request, PaymentInfo.builder()
+                                .address(address)
+                                .phoneNumber(phone)
+                        .build()))
                 .build();
     }
 

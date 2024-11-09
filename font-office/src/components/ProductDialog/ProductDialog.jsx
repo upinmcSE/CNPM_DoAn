@@ -1,22 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { addProductToOrder } from '../../apis/orderService';
+import { ToastContext } from '../../context/ToastContext';
 
 const ProductDialog = ({ product, onClose, onBuy }) => {
   const [quantity, setQuantity] = useState(1);
+  const { toast } = useContext(ToastContext); // Sử dụng ToastContext
 
   const handleQuantityChange = (event) => {
     const value = Math.max(1, parseInt(event.target.value) || 1);
     setQuantity(value);
   };
 
-  const handleAddToCart = (product, quantity) => {
+  const handleAddToCart = async (product, quantity) => {
     const orderline = {
       productId: product.id,
       amount: quantity,
     };
-    addProductToOrder(orderline, localStorage.getItem('orderId'));
-  }
-  console.log(product);
+    await addProductToOrder(orderline, localStorage.getItem('orderId'));
+  };
+
+  const handleLoginCheck = async (action, product, quantity) => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      await action(product, quantity);
+    } else {
+      toast.error('Vui lòng đăng nhập để thực hiện thao tác này!');
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -42,7 +52,7 @@ const ProductDialog = ({ product, onClose, onBuy }) => {
         <div className="mt-4 flex justify-between">
           <button
             onClick={() => {
-              onBuy(product, quantity);
+              handleLoginCheck(onBuy, product, quantity);
               onClose();
             }}
             className="px-4 py-2 bg-primary text-white rounded"
@@ -51,7 +61,7 @@ const ProductDialog = ({ product, onClose, onBuy }) => {
           </button>
           <button
             onClick={() => {
-              handleAddToCart(product, quantity); // Thêm vào giỏ hàng
+              handleLoginCheck(handleAddToCart, product, quantity);
               onClose();
             }}
             className="px-4 py-2 bg-gray-300 rounded"

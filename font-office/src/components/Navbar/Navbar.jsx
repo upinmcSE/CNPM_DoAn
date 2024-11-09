@@ -222,7 +222,6 @@ const Navbar = () => {
           purchasePoints: 1500,
         }}
         onUpdate={(updatedData) => {
-          console.log("Thông tin người dùng đã được cập nhật:", updatedData);
           handleProfileClose(); // Đóng dialog sau khi cập nhật
         }}
       />
@@ -240,7 +239,6 @@ const Navbar = () => {
         isOpen={isPasswordDialogOpen}
         onClose={handleCloseChangePassword}
         onSubmit={(data) => {
-          console.log("Dữ liệu đổi mật khẩu:", data);
           handleCloseChangePassword(); // Đóng dialog sau khi đổi mật khẩu
         }}
       />

@@ -34,7 +34,6 @@ public class CacheServiceImpl implements CacheService {
             return null;
         }
         var orderCache = redisTemplate.opsForValue().get("order:" + orderId);
-        System.out.println(orderCache);
         return (OrderCache) orderCache;
     }
 

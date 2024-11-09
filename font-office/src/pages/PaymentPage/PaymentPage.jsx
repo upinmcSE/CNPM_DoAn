@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { getCart } from '../../apis/orderService';
 import { useNavigate  } from 'react-router-dom';
+import { payOrder } from '../../apis/paymentService';
+
 const PaymentPage = () => {
     const [cartItems, setCartItems] = useState([]);
     const [paymentMethod, setPaymentMethod] = useState('cash'); // thanh toan mac dinh la tien mat
     const [deliveryAddress, setDeliveryAddress] = useState('');
+    const [deliveryPhone, setDeliveryPhone] = useState('');
     const navigate = useNavigate();
 
     // goi api de lay danh sach san pham trong gio hang
@@ -21,10 +24,27 @@ const PaymentPage = () => {
         loadCartItems();
     }, []); // chi goi api 1 lan khi component duoc render
 
-    const handlePayment = () => {
+    const handlePayment = async () => {
         // xu ly thanh toan tuy theo phuong thuc thanh toan
-        console.log(`Thanh toán thành công với phương thức: ${paymentMethod}`);
+        const paymentInfo = {
+            phone: deliveryPhone,
+            address: deliveryAddress
+        }
+        try {
+            const response = await payOrder(paymentMethod, paymentInfo);
+            
+            // Redirect tới URL thanh toán nhận được từ API
+            if (response.result && response.result.paymentUrl) {
+                window.location.href = response.result.paymentUrl;
+            } else {
+                console.error("Payment URL not found in the response");
+            }
+        } catch (error) {
+            console.error("Error paying order: ", error);
+        }
     };
+
+
     const handleGoHome = () => {
         navigate('/'); 
     };
@@ -54,6 +74,19 @@ const PaymentPage = () => {
             </div>
 
             {/* Input for delivery address */}
+            <div className="mt-4">
+                <label htmlFor="deliveryPhone" className="block text-sm font-medium text-gray-700 mb-2">
+                    Số điện thoại
+                </label>
+                <input
+                    type="text"
+                    id="deliveryPhone"
+                    value={deliveryPhone}
+                    onChange={(e) => setDeliveryPhone(e.target.value)} // Update state on change
+                    className="block w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2"
+                    placeholder="Nhập số điện thoại nhận hàng"
+                />
+            </div>
             <div className="mt-4">
                 <label htmlFor="deliveryAddress" className="block text-sm font-medium text-gray-700 mb-2">
                     Địa chỉ nhận hàng
@@ -95,8 +128,8 @@ const PaymentPage = () => {
                         type="radio"
                         className="form-radio"
                         value="vnpay"
-                        checked={paymentMethod === 'vnpay'}
-                        onChange={() => setPaymentMethod('vnpay')}
+                        checked={paymentMethod === 'vn-pay'}
+                        onChange={() => setPaymentMethod('vn-pay')}
                     />
                     <span className="ml-2">Ví điện tử VNPay</span>
                 </label>

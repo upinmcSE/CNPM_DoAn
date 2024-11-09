@@ -5,11 +5,9 @@ import com.upinmcSE.coffeeshop.dto.response.PageResponse;
 import com.upinmcSE.coffeeshop.dto.response.ProductResponse;
 import com.upinmcSE.coffeeshop.entity.Category;
 import com.upinmcSE.coffeeshop.entity.Product;
-import com.upinmcSE.coffeeshop.entity.ProductDocument;
 import com.upinmcSE.coffeeshop.entity.ProductImage;
 import com.upinmcSE.coffeeshop.exception.ErrorCode;
 import com.upinmcSE.coffeeshop.exception.ErrorException;
-import com.upinmcSE.coffeeshop.mapper.ElasticMapper;
 import com.upinmcSE.coffeeshop.mapper.ProductMapper;
 import com.upinmcSE.coffeeshop.repository.*;
 import com.upinmcSE.coffeeshop.service.ProductService;
@@ -22,16 +20,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -43,8 +34,6 @@ public class ProductServiceImpl implements ProductService {
     ProductImageRepository productImageRepository;
     OrderLineRepository orderLineRepository;
     FileUtil fileUtil;
-    ProductElasticSearchRepository productElasticSearchRepository;
-    ElasticMapper elasticMapper;
 
 
     @Transactional
@@ -76,9 +65,6 @@ public class ProductServiceImpl implements ProductService {
 
         //product = productRepository.save(product); dcm chưa giải quyết được lỗi này
 
-        // dòng bộ data sang bên elastic search
-        ProductDocument document = elasticMapper.toProductDocument(product);
-        productElasticSearchRepository.save(document);
         return productMapper.toProductResponse(product);
     }
 
@@ -97,10 +83,6 @@ public class ProductServiceImpl implements ProductService {
         product.setProductImage(productImage);
         product = productRepository.saveAndFlush(product);
 
-        // đồng bộ data sang bên elastic search
-        ProductDocument document = elasticMapper.toProductDocument(product);
-        productElasticSearchRepository.save(document);
-
         return productMapper.toProductResponse(product);
     }
     @Transactional
@@ -116,10 +98,6 @@ public class ProductServiceImpl implements ProductService {
                 () -> new ErrorException(ErrorCode.NOT_FOUND_CATEGORY));
         product.setCategory(category);
         product = productRepository.saveAndFlush(product);
-
-        // đồng bộ data sang bên elastic search
-        ProductDocument document = elasticMapper.toProductDocument(product);
-        productElasticSearchRepository.save(document);
 
         return productMapper.toProductResponse(product);
     }
@@ -179,7 +157,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void delete(String id) {
         productRepository.deleteById(id);
-        productElasticSearchRepository.deleteById(id);
     }
 
 

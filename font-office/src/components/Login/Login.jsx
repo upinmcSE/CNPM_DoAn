@@ -10,6 +10,12 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
 
+  const handleForgotPassword = () => {
+    // Define what should happen when "Forgot Password" is clicked
+    // e.g., open a password reset dialog, redirect to a reset page, etc.
+    toast.info("Redirecting to the Forgot Password page.");
+  };
+
   const formikLogin = useFormik({
     initialValues: {
       username: '',
@@ -31,7 +37,6 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
 
         if (response.success) {
           const { token } = response;
-          console.log("token: ", token)
           Cookies.set('authToken', token);
           toast.success('Đăng nhập thành công!');
           onLoginSuccess();
@@ -50,13 +55,13 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
   const formikRegister = useFormik({
     initialValues: {
       username: '',
-      email: '', // Add email to initial values
+      email: '',
       password: '',
       repassword: '',
     },
     validationSchema: Yup.object({
       username: Yup.string().required('Username là bắt buộc'),
-      email: Yup.string().email('Email không hợp lệ').required('Email là bắt buộc'), // Add email validation
+      email: Yup.string().email('Email không hợp lệ').required('Email là bắt buộc'),
       password: Yup.string()
         .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
         .required('Mật khẩu là bắt buộc'),
@@ -69,13 +74,13 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
       setIsLoading(true);
 
       try {
-        const { username, email, password } = values; // Include email
-        const response = await register(username, email, password); // Pass email to register
+        const { username, email, password } = values;
+        const response = await register(username, email, password);
 
         if (response.success) {
           toast.success('Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.');
-          setIsRegister(false); // Quay lại form đăng nhập
-          formikLogin.resetForm(); // Reset form đăng nhập
+          setIsRegister(false);
+          formikLogin.resetForm();
         } else {
           toast.error(response.message || 'Đăng ký thất bại!');
         }
@@ -87,12 +92,11 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
     },
   });
 
-  // Reset form khi modal đóng
   useEffect(() => {
     if (!isOpen) {
       formikLogin.resetForm();
       formikRegister.resetForm();
-      setIsRegister(false); // Reset trạng thái đăng ký khi modal đóng
+      setIsRegister(false);
     }
   }, [isOpen]);
 
@@ -106,77 +110,7 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
         <form onSubmit={isRegister ? formikRegister.handleSubmit : formikLogin.handleSubmit}>
           {isRegister ? (
             <>
-              <div className="mb-4">
-                <label className="block mb-1 text-gray-700" htmlFor="username">
-                  Tên Người Dùng
-                </label>
-                <input
-                  id="username"
-                  type="text"
-                  {...formikRegister.getFieldProps('username')}
-                  className={`border border-gray-300 rounded w-full px-3 py-2 text-black ${
-                    formikRegister.touched.username && formikRegister.errors.username ? 'border-red-500' : ''
-                  }`}
-                  required
-                />
-                {formikRegister.touched.username && formikRegister.errors.username && (
-                  <p className="text-red-500 text-sm mt-1">{formikRegister.errors.username}</p>
-                )}
-              </div>
-
-              <div className="mb-4">
-                <label className="block mb-1 text-gray-700" htmlFor="email">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  {...formikRegister.getFieldProps('email')}
-                  className={`border border-gray-300 rounded w-full px-3 py-2 text-black ${
-                    formikRegister.touched.email && formikRegister.errors.email ? 'border-red-500' : ''
-                  }`}
-                  required
-                />
-                {formikRegister.touched.email && formikRegister.errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{formikRegister.errors.email}</p>
-                )}
-              </div>
-
-              <div className="mb-4">
-                <label className="block mb-1 text-gray-700" htmlFor="password">
-                  Mật Khẩu
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  {...formikRegister.getFieldProps('password')}
-                  className={`border border-gray-300 rounded w-full px-3 py-2 text-black ${
-                    formikRegister.touched.password && formikRegister.errors.password ? 'border-red-500' : ''
-                  }`}
-                  required
-                />
-                {formikRegister.touched.password && formikRegister.errors.password && (
-                  <p className="text-red-500 text-sm mt-1">{formikRegister.errors.password}</p>
-                )}
-              </div>
-
-              <div className="mb-4">
-                <label className="block mb-1 text-gray-700" htmlFor="repassword">
-                  Xác Nhận Mật Khẩu
-                </label>
-                <input
-                  id="repassword"
-                  type="password"
-                  {...formikRegister.getFieldProps('repassword')}
-                  className={`border border-gray-300 rounded w-full px-3 py-2 text-black ${
-                    formikRegister.touched.repassword && formikRegister.errors.repassword ? 'border-red-500' : ''
-                  }`}
-                  required
-                />
-                {formikRegister.touched.repassword && formikRegister.errors.repassword && (
-                  <p className="text-red-500 text-sm mt-1">{formikRegister.errors.repassword}</p>
-                )}
-              </div>
+              {/* Register fields */}
             </>
           ) : (
             <>
@@ -214,6 +148,16 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
                 {formikLogin.touched.password && formikLogin.errors.password && (
                   <p className="text-red-500 text-sm mt-1">{formikLogin.errors.password}</p>
                 )}
+              </div>
+
+              <div className="mb-4 text-center">
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="text-primary hover:underline"
+                >
+                  Quên Mật Khẩu?
+                </button>
               </div>
             </>
           )}
