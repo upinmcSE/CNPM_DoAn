@@ -8,6 +8,7 @@ import com.nimbusds.jwt.SignedJWT;
 import com.upinmcSE.coffeeshop.dto.request.*;
 import com.upinmcSE.coffeeshop.dto.response.AuthenticationResponse;
 import com.upinmcSE.coffeeshop.dto.response.IntrospectResponse;
+import com.upinmcSE.coffeeshop.entity.Customer;
 import com.upinmcSE.coffeeshop.entity.InvalidatedToken;
 import com.upinmcSE.coffeeshop.entity.Role;
 import com.upinmcSE.coffeeshop.exception.ErrorCode;
@@ -16,6 +17,8 @@ import com.upinmcSE.coffeeshop.repository.CustomerRepository;
 import com.upinmcSE.coffeeshop.repository.EmployeeRepository;
 import com.upinmcSE.coffeeshop.repository.InvalidatedTokenRepository;
 import com.upinmcSE.coffeeshop.service.AuthenticationService;
+import com.upinmcSE.coffeeshop.service.MailService;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.ParseException;
@@ -45,6 +49,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     InvalidatedTokenRepository invalidatedTokenRepository;
     CustomerRepository customerRepository;
     EmployeeRepository employeeRepository;
+    MailServiceImpl mailService;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -136,6 +141,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         customer.setPassword(passwordEncoder.encode(request.newPassword()));
         customerRepository.saveAndFlush(customer);
+    }
+
+    @Override
+    public void forgotPassword(String phone) throws MessagingException, UnsupportedEncodingException {
+        Customer customer = customerRepository.findByUsername(phone).orElseThrow(() ->
+                new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+        // send email
+        String otp = UUID.randomUUID().toString().substring(0, 6);
+        mailService.sendEmail(customer.getEmail(), "OTP", otp);
     }
 
     @Transactional

@@ -5,12 +5,19 @@ import com.upinmcSE.coffeeshop.dto.request.*;
 import com.upinmcSE.coffeeshop.dto.response.AuthenticationResponse;
 import com.upinmcSE.coffeeshop.dto.response.IntrospectResponse;
 import com.upinmcSE.coffeeshop.dto.response.SuccessResponse;
+import com.upinmcSE.coffeeshop.entity.Customer;
+import com.upinmcSE.coffeeshop.exception.ErrorCode;
+import com.upinmcSE.coffeeshop.exception.ErrorException;
+import com.upinmcSE.coffeeshop.repository.CustomerRepository;
 import com.upinmcSE.coffeeshop.service.impl.AuthenticationServiceImpl;
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 
@@ -23,6 +30,7 @@ import java.text.ParseException;
 public class AuthenticationController {
 
     AuthenticationServiceImpl authenticationService;
+    CustomerRepository customerRepository;
 
     @PostMapping("/customer-login")
     public SuccessResponse<AuthenticationResponse> customerLogin(
@@ -73,6 +81,14 @@ public class AuthenticationController {
         authenticationService.changePassword(request);
         return SuccessResponse.<Void>builder()
                 .message("Chang password successfully")
+                .build();
+    }
+
+    @PostMapping("/forgot-password")
+    public SuccessResponse<Void> forgotPassword(@RequestParam String phoneNumber) throws MessagingException, UnsupportedEncodingException {
+        authenticationService.forgotPassword(phoneNumber);
+        return SuccessResponse.<Void>builder()
+                .message("Send email successfully")
                 .build();
     }
 

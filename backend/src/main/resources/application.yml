@@ -15,6 +15,20 @@ spring:
       ddl-auto: update
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
+  mail:
+    port: 587
+    from: upinmc123@gmail.com
+    host: smtp.gmail.com
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+        mail:
+            smtp:
+              auth: true
+              starttls:
+                enable: true
+                required: true
+
 
   data:
     redis:
