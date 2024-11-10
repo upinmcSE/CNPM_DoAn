@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getCart } from '../../apis/orderService';
 import { useNavigate  } from 'react-router-dom';
-import { payOrder } from '../../apis/paymentService';
+import { payOrder, payOrderCash } from '../../apis/paymentService';
 
 const PaymentPage = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -31,14 +31,26 @@ const PaymentPage = () => {
             address: deliveryAddress
         }
         try {
-            const response = await payOrder(paymentMethod, paymentInfo);
-            
-            // Redirect tới URL thanh toán nhận được từ API
-            if (response.result && response.result.paymentUrl) {
-                window.location.href = response.result.paymentUrl;
-            } else {
-                console.error("Payment URL not found in the response");
+            if (paymentMethod === 'cash') {
+                const response = await payOrderCash(paymentInfo);
+                console.log(response);
+                if (response.code == 1000) {
+                    alert("Thanh toán thành công");
+                    console.log(response.result);
+                    navigate('/');
+                } else {
+                    alert("Thanh toán thất bại");
+                }
+            }else{
+                const response = await payOrder(paymentMethod, paymentInfo);
+                if (response.result && response.result.paymentUrl) {
+                    // Redirect tới URL thanh toán nhận được từ API
+                    window.location.href = response.result.paymentUrl;
+                } else {
+                    console.error("Payment URL not found in the response");
+                }
             }
+
         } catch (error) {
             console.error("Error paying order: ", error);
         }

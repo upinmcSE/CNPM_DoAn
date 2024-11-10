@@ -30,7 +30,8 @@ public enum ErrorCode {
     NOT_FOUND_EMPLOYEE(2009, "Not found employee", HttpStatus.NOT_FOUND),
     NOT_FOUND_ORDER(3001, "Not found order", HttpStatus.NOT_FOUND),
     NOT_FOUND_EMPLOYEELV(3002, "Not found employee lv", HttpStatus.NOT_FOUND),
-    NOT_FOUND_ORDER_LINE(3003, "Not found order line", HttpStatus.NOT_FOUND)
+    NOT_FOUND_ORDER_LINE(3003, "Not found order line", HttpStatus.NOT_FOUND),
+    NOT_FOUND_PAYMENT(3004, "Not found payment", HttpStatus.NOT_FOUND),
 
     ;
 

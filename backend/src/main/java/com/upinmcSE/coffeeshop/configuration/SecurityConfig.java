@@ -36,7 +36,7 @@ public class SecurityConfig {
             "/api/v1/products/category",
             "api/v1/products/images/**",
             "api/v1/banners/**",
-            "/api/v1/payment/callback"
+            "/api/v1/payment/vn-pay-callback"
     };
 
     @Autowired

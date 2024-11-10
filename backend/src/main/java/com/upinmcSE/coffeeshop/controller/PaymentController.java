@@ -16,6 +16,7 @@ import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Map;
 
@@ -47,15 +48,16 @@ public class PaymentController {
     }
 
     @GetMapping("/vn-pay-callback")
-    public SuccessResponse<?> vnPayCallbackHandler(HttpServletRequest request) {
+    public RedirectView vnPayCallbackHandler(HttpServletRequest request) {
         String status = request.getParameter("vnp_ResponseCode");
         String amount = request.getParameter("vnp_Amount");
         String orderInfo = request.getParameter("vnp_OrderInfo");
-        if(status.equals("00")){
+
+        if (status.equals("00")) {
             paymentService.handCallBack(orderInfo);
-            return SuccessResponse.builder().message("Payment Successfully, Total price: "+ amount).build();
-        }else{
-            return SuccessResponse.builder().message("Payment Fail").build();
+            return new RedirectView("http://localhost:5173/");
+        } else {
+            return new RedirectView("http://localhost:5173/payment-failure");
         }
     }
 
@@ -129,5 +131,19 @@ public class PaymentController {
 //        }
 //    }
 
-
+    @PostMapping("/cash")
+    public SuccessResponse<?> cashPayment(
+            @RequestParam String phone,
+            @RequestParam String address
+    ) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Customer customer = customerRepository.findByUsername(username).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+        return SuccessResponse.builder().message("Payment Successfully")
+                .result(paymentService.createPaymentCash(customer, PaymentInfo.builder()
+                        .address(address)
+                        .phoneNumber(phone)
+                        .build()))
+                .build();
+    }
 }

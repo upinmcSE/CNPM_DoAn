@@ -42,5 +42,10 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public void removeOrderFromCache(String orderId) {
         redisTemplate.delete("order:" + orderId);
+        String customerId = (String) redisTemplate.opsForValue().get("order:byCustomer:" + orderId);
+
+        if (customerId != null) {
+            redisTemplate.delete("order:byCustomer:" + customerId);
+        }
     }
 }

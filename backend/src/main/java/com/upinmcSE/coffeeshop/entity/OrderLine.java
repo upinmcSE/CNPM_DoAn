@@ -21,7 +21,7 @@ public class OrderLine {
 
     Integer amount;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id")
     Order order;
 }
