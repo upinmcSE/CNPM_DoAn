@@ -1,10 +1,11 @@
 import React, { useState, useContext } from 'react';
-import { addProductToOrder } from '../../apis/orderService';
+import { addProductToOrder, buyNow } from '../../apis/orderService';
 import { ToastContext } from '../../context/ToastContext';
-
+import { useNavigate } from 'react-router-dom';
 const ProductDialog = ({ product, onClose, onBuy }) => {
   const [quantity, setQuantity] = useState(1);
   const { toast } = useContext(ToastContext); // Sử dụng ToastContext
+  const navigate = useNavigate();
 
   const handleQuantityChange = (event) => {
     const value = Math.max(1, parseInt(event.target.value) || 1);
@@ -18,6 +19,17 @@ const ProductDialog = ({ product, onClose, onBuy }) => {
     };
     await addProductToOrder(orderline, localStorage.getItem('orderId'));
   };
+
+  const handleOnBuy = async (product, quantity) => {
+    const orderline = {
+      productId: product.id,
+      amount: quantity,
+    }
+    await addProductToOrder(orderline, localStorage.getItem('orderId'));
+    navigate('/payment');
+
+  }
+
 
   const handleLoginCheck = async (action, product, quantity) => {
     const token = localStorage.getItem('authToken');
@@ -52,7 +64,7 @@ const ProductDialog = ({ product, onClose, onBuy }) => {
         <div className="mt-4 flex justify-between">
           <button
             onClick={() => {
-              handleLoginCheck(onBuy, product, quantity);
+              handleLoginCheck(handleOnBuy, product, quantity);
               onClose();
             }}
             className="px-4 py-2 bg-primary text-white rounded"

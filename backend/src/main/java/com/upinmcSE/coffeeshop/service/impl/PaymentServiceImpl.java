@@ -10,6 +10,7 @@ import com.upinmcSE.coffeeshop.enums.Status;
 import com.upinmcSE.coffeeshop.exception.ErrorCode;
 import com.upinmcSE.coffeeshop.exception.ErrorException;
 import com.upinmcSE.coffeeshop.repository.CustomerRepository;
+import com.upinmcSE.coffeeshop.repository.MemberLVRepository;
 import com.upinmcSE.coffeeshop.repository.OrderRepository;
 import com.upinmcSE.coffeeshop.repository.PaymentRepository;
 import com.upinmcSE.coffeeshop.service.PaymentService;
@@ -38,6 +39,7 @@ public class PaymentServiceImpl implements PaymentService {
     MoMoConfig moMoConfig;
     CacheServiceImpl cacheService;
     CustomerRepository customerRepository;
+    MemberLVRepository memberLVRepository;
 
     @Override
     public PaymentResponse createPaymentVNPAY(String customerId, HttpServletRequest request, PaymentInfo paymentInfo) {
@@ -115,10 +117,25 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Transactional
     @Override
-    public void completePayment(String paymentId) {
+    public void completePayment(String choice, String paymentId) {
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(
                 () -> new ErrorException(ErrorCode.NOT_FOUND_PAYMENT));
-        payment.setStatus(Status.COMPLETED);
+        if (choice.equals("accept")) {
+            payment.setStatus(Status.COMPLETED);
+            Customer customer = payment.getOrder().getCustomer();
+            customer.setPoint(customer.getPoint() + 1);
+            if(customer.getPoint() >= 10){
+                MemberLv memberLv = memberLVRepository.findByName("VIP");
+                customer.setMemberLv(memberLv);
+            }
+            customerRepository.save(customer);
+            paymentRepository.save(payment);
+
+        }else {
+            payment.setStatus(Status.CANCELLED);
+            paymentRepository.save(payment);
+        }
+
     }
 
     @Scheduled(fixedRate = 3600000) // dat lịch kiem tra he thong moi 1h
@@ -184,6 +201,13 @@ public class PaymentServiceImpl implements PaymentService {
                 .phoneNumber(phoneNumber)
                 .status(Status.COMPLETED)
                 .build();
+        customer.setPoint(customer.getPoint() + 1);
+        if(customer.getPoint() >= 10){
+            MemberLv memberLv = memberLVRepository.findByName("VIP");
+            customer.setMemberLv(memberLv);
+        }
+        customerRepository.save(customer);
+
         paymentRepository.save(payment);
         cacheService.removeOrderFromCache(orderCache.getId());
     }

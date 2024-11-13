@@ -4,16 +4,16 @@ import * as Yup from "yup";
 import { login, register } from "../../apis/authService";
 import { ToastContext } from "../../context/ToastContext";
 import Cookies from "js-cookie";
+import ForgotPasswordDialog from "../ForgotPassword/ForgotPasswordDialog";
 
 const Login = ({ isOpen, onClose, onLoginSuccess }) => {
   const { toast } = useContext(ToastContext);
   const [isLoading, setIsLoading] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
+  const [isOpenForgotPassword, setIsOpenForgotPassword] = useState(false);
 
   const handleForgotPassword = () => {
-    // Define what should happen when "Forgot Password" is clicked
-    // e.g., open a password reset dialog, redirect to a reset page, etc.
-    toast.info("Redirecting to the Forgot Password page.");
+    setIsOpenForgotPassword(true);
   };
 
   const formikLogin = useFormik({
@@ -184,6 +184,11 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
               {isRegister ? 'Đăng Nhập' : 'Đăng Ký'}
             </button>
           </div>
+          
+          <ForgotPasswordDialog 
+            isOpen={isOpenForgotPassword} 
+            onClose={() => setIsOpenForgotPassword(false)} 
+          />
         </form>
       </div>
     </div>

@@ -12,6 +12,8 @@ import "aos/dist/aos.css";
 import Products from "./components/Products/Products.jsx";
 import { ToastProvider } from "./context/ToastContext.jsx";
 import PaymentPage from "./pages/PaymentPage/PaymentPage.jsx";
+import SuccessPage from "./pages/SuccessPage/SuccessPage.jsx";
+import ForgotPasswordPage from "./components/ForgotPassword/ForgotPasswordDialog.jsx";
 
 const App = () => {
   React.useEffect(() => {
@@ -42,6 +44,7 @@ const App = () => {
               </>
             } />
             <Route path="/payment" element={<PaymentPage />} />
+            <Route path="/success" element={<SuccessPage />} />
           </Routes>
         </Router>
       </ToastProvider>

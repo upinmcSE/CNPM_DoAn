@@ -9,7 +9,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/coffee_shop
     username: root
-    password: hathienlon
+    password: ${MSQL_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,7 +17,7 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
   mail:
     port: 587
-    from: upinmc123@gmail.com
+    from: ${MAIL}
     host: smtp.gmail.com
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
@@ -34,10 +34,6 @@ spring:
     redis:
       host: localhost
       port: 6379
-#    elasticsearch:
-#      cluster-name: es_coffee_shop
-#      rest:
-#        uris: http://localhost:9200
 
 http:
   client:

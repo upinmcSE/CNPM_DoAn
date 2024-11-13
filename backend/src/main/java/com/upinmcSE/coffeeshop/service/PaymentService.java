@@ -13,7 +13,7 @@ public interface PaymentService {
     Map<String, Object> createPaymentMOMO(String orderId) throws Exception;
 
     String createPaymentCash(Customer customer, PaymentInfo paymentInfo);
-    void completePayment(String paymentId);
+    void completePayment(String choice, String paymentId);
     void checkPaymentPending();
 
     void handCallBack(String orderInfo);

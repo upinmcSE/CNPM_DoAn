@@ -111,6 +111,7 @@ const introspect = async ({token}) => {
             }
         });
         return response.data
+
     }catch(error){
         console.error("Introspect error: ", error);
         return {
@@ -120,5 +121,53 @@ const introspect = async ({token}) => {
     }
 }
 
+const forgotPassword = async (phoneNumber) => {
+    try{
+        var response = await axiosClient.post('/authentication/forgot-password',null, {
+            params: {
+                phoneNumber: phoneNumber
+              }
+        });
+        console.log("response: ", response)
+        return response.data
+    }catch(error){
+        console.error("Forgot password error: ", error);
+    }
+}
 
-export { login, logout, register, changePassword, introspect };
+const verifyOTP = async (otp) => {
+    try{
+        var phone = localStorage.getItem('phoneNumber');
+        console.log("phoneNumber: ", phone)
+        var response = await axiosClient.post('/authentication/check-otp', {phone, otp},
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        )
+        console.log("response: ", response.data)
+        return response.data
+    }catch(error){
+        console.error("Verify OTP error: ", error);
+    }
+}
+
+const resetPassword = async (newPassword) => {
+    try{
+        var phone = localStorage.getItem('phoneNumber');
+        var response = await axiosClient.post('/authentication/reset-password', {phone, password: newPassword},
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        )
+        return response.data
+    }catch(error){
+        console.error("Reset password error: ", error);
+    }
+}
+
+
+export { login, logout, register, changePassword, introspect, forgotPassword, verifyOTP, resetPassword };

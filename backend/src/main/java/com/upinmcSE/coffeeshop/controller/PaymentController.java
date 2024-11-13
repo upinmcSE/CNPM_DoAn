@@ -55,7 +55,7 @@ public class PaymentController {
 
         if (status.equals("00")) {
             paymentService.handCallBack(orderInfo);
-            return new RedirectView("http://localhost:5173/");
+            return new RedirectView("http://localhost:5173/success");
         } else {
             return new RedirectView("http://localhost:5173/payment-failure");
         }

@@ -43,8 +43,13 @@ const Navbar = () => {
     }
     try {
       const token = localStorage.getItem('authToken');
-      await introspect(token); // Gọi API để verify token
-      setIsLoggedIn(true);
+      const res = await introspect(token); // Gọi API để verify token
+      if(res.result.valid == true){
+        setIsLoggedIn(true);
+      }else{
+        localStorage.removeItem('authToken');
+        setIsLoggedIn(false);
+      }
     } catch (error) {
       console.error("Token invalid or expired:", error);
       localStorage.removeItem('authToken');

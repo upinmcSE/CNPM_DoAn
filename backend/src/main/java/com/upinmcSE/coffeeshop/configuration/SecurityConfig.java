@@ -30,6 +30,8 @@ public class SecurityConfig {
             "/api/v1/authentication/logout",
             "/api/v1/authentication/introspect",
             "/api/v1/authentication/forgot-password",
+            "/api/v1/authentication/check-otp",
+            "/api/v1/authentication/reset-password",
             "api/v1/customers/add",
             "api/v1/payment/vn-pay-callback",
             "/api/v1/products/outstanding",

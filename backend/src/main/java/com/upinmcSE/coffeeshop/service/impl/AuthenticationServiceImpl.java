@@ -50,6 +50,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     CustomerRepository customerRepository;
     EmployeeRepository employeeRepository;
     MailServiceImpl mailService;
+    CacheServiceImpl cacheService;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -149,7 +150,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
         // send email
         String otp = UUID.randomUUID().toString().substring(0, 6);
-        mailService.sendEmail(customer.getEmail(), "OTP", otp);
+        mailService.sendEmail(customer.getEmail(), "OTP", "Anh cũng đến hết hơi với em đấy, otp của em đấy lấy đi: " +otp);
+        // save otp in redis
+        cacheService.saveOtpToCache(customer.getEmail(), otp);
+    }
+
+    @Override
+    public void checkOtp(String email, CheckOtpRequest request) {
+        String otp = cacheService.getOtpFromCache(email);
+        System.out.println(otp);
+        if(!otp.equals(request.otp())){
+            throw new ErrorException(ErrorCode.NOT_MATCH_OTP);
+        }
+    }
+
+    @Override
+    public void resetPassword(ResetPasswordRequest request) {
+        Customer customer = customerRepository.findByUsername(request.phone()).orElseThrow(() ->
+                new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+        customer.setPassword(new BCryptPasswordEncoder(10).encode(request.password()));
+        customerRepository.saveAndFlush(customer);
+        cacheService.removeOtpFromCache(customer.getEmail());
     }
 
     @Transactional

@@ -32,15 +32,8 @@ const PaymentPage = () => {
         }
         try {
             if (paymentMethod === 'cash') {
-                const response = await payOrderCash(paymentInfo);
-                console.log(response);
-                if (response.code == 1000) {
-                    alert("Thanh toán thành công");
-                    console.log(response.result);
-                    navigate('/');
-                } else {
-                    alert("Thanh toán thất bại");
-                }
+                await payOrderCash(paymentInfo);
+                navigate('/success');
             }else{
                 const response = await payOrder(paymentMethod, paymentInfo);
                 if (response.result && response.result.paymentUrl) {

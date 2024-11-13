@@ -4,6 +4,7 @@ import com.nimbusds.jose.JOSEException;
 import com.upinmcSE.coffeeshop.dto.request.*;
 import com.upinmcSE.coffeeshop.dto.response.AuthenticationResponse;
 import com.upinmcSE.coffeeshop.dto.response.IntrospectResponse;
+import com.upinmcSE.coffeeshop.entity.Customer;
 import jakarta.mail.MessagingException;
 
 import java.io.UnsupportedEncodingException;
@@ -17,6 +18,8 @@ public interface AuthenticationService {
     void logout(LogoutRequest request);
     void changePassword(ChangePasswordRequest request);
     void forgotPassword(String phone) throws MessagingException, UnsupportedEncodingException;
+    void checkOtp(String email, CheckOtpRequest request);
+    void resetPassword(ResetPasswordRequest request);
     AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException, InvocationTargetException, NoSuchMethodException, IllegalAccessException;
 
 }

@@ -64,6 +64,22 @@ const getCart = async () => {
     }
 };
 
+const buyNow = async (productId) => {
+    try{
+        const token = localStorage.getItem('authToken');
+        const res = await axiosClient.post(`/orders/buy-now/${productId}`, {}, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+        console.log("res: ", res);
+    }catch(error){
+        console.error("Error buying now: ", error);
+        throw error;
+    }
+}
+
 const removeItemFromOrder = async (orderId, orderLineId) => {
     try{
         const token = localStorage.getItem('authToken');
@@ -80,4 +96,4 @@ const removeItemFromOrder = async (orderId, orderLineId) => {
     }
 }
 
-export { createOrder, addProductToOrder, removeItemFromOrder, getCart }
+export { createOrder, addProductToOrder, removeItemFromOrder, getCart, buyNow }

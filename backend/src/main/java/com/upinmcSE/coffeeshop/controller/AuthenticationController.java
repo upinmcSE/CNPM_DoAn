@@ -91,5 +91,23 @@ public class AuthenticationController {
                 .message("Send email successfully")
                 .build();
     }
+    @PostMapping("/check-otp")
+    public SuccessResponse<Void> checkOtp(@RequestBody CheckOtpRequest request) {
+        System.out.println(request.phone() +"-"+ request.otp());
+        Customer customer = customerRepository.findByUsername(request.phone())
+                .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+        authenticationService.checkOtp(customer.getEmail(),request);
+        return SuccessResponse.<Void>builder()
+                .message("Check otp successfully")
+                .build();
+    }
+
+    @PostMapping("/reset-password")
+    public SuccessResponse<Void> resetPassword(@RequestBody ResetPasswordRequest request) {
+        authenticationService.resetPassword(request);
+        return SuccessResponse.<Void>builder()
+                .message("Reset password successfully")
+                .build();
+    }
 
 }

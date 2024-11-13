@@ -37,7 +37,6 @@ public class CacheServiceImpl implements CacheService {
         return (OrderCache) orderCache;
     }
 
-
     @Transactional
     @Override
     public void removeOrderFromCache(String orderId) {
@@ -47,5 +46,21 @@ public class CacheServiceImpl implements CacheService {
         if (customerId != null) {
             redisTemplate.delete("order:byCustomer:" + customerId);
         }
+    }
+
+    @Override
+    public void saveOtpToCache(String email, String otp) {
+        redisTemplate.opsForValue().set("otp:" + email, otp);
+    }
+
+    @Override
+    public String getOtpFromCache(String email) {
+        var otp = redisTemplate.opsForValue().get("otp:" + email);
+        return Objects.requireNonNullElse(otp, "").toString();
+    }
+
+    @Override
+    public void removeOtpFromCache(String email) {
+        redisTemplate.delete("otp:" + email);
     }
 }

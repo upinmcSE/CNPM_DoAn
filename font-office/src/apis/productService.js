@@ -13,5 +13,16 @@ const getProductCategory = async (category, page, size) => {
 
 }
 
+const getProductOutstanding = async () => {
+    try{
+        const res = await axiosClient.get('/products/outstanding');
+        console.log("res: ", res);
+        return res.data;
+    }catch(error){
+        console.error("Error fetching outstanding products: ", error);
+        throw error;
+    }
+}
 
-export {getProductCategory}
+
+export {getProductCategory, getProductOutstanding}
