@@ -2,7 +2,7 @@ import axiosClient from "./axiosClient";
 
 const createOrder = async () => {
     try {
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('Token');
         console.log("tokenxxx: ", token);
         const res = await axiosClient.post(`/orders/create`, {}, 
             {
@@ -22,7 +22,7 @@ const createOrder = async () => {
 
 const addProductToOrder = async (orderline, orderId) => {
     try{
-        const token = localStorage.getItem('authToken')
+        const token = localStorage.getItem('Token')
         console.log("orderId: ", orderId);
         console.log("orderline: ", orderline);
         const res = await axiosClient.post(`/orders/add-line/${orderId}`,orderline, {
@@ -43,7 +43,7 @@ const addProductToOrder = async (orderline, orderId) => {
 
 const getCart = async () => {
     try {
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('Token');
         if (!token) {
             console.error("No auth token found");
             return []; // Hoặc có thể xử lý một cách thích hợp
@@ -66,7 +66,7 @@ const getCart = async () => {
 
 const buyNow = async (productId) => {
     try{
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('Token');
         const res = await axiosClient.post(`/orders/buy-now/${productId}`, {}, {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -82,7 +82,7 @@ const buyNow = async (productId) => {
 
 const removeItemFromOrder = async (orderId, orderLineId) => {
     try{
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('Token');
         const res = await axiosClient.delete(`/orders/remove-line/${orderId}/${orderLineId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,

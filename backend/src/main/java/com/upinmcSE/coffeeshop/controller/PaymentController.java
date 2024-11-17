@@ -1,9 +1,12 @@
 package com.upinmcSE.coffeeshop.controller;
 
 import com.upinmcSE.coffeeshop.dto.request.PaymentInfo;
+import com.upinmcSE.coffeeshop.dto.response.PageResponse;
+import com.upinmcSE.coffeeshop.dto.response.PaymentOrderResponse;
 import com.upinmcSE.coffeeshop.dto.response.PaymentResponse;
 import com.upinmcSE.coffeeshop.dto.response.SuccessResponse;
 import com.upinmcSE.coffeeshop.entity.Customer;
+import com.upinmcSE.coffeeshop.entity.Payment;
 import com.upinmcSE.coffeeshop.exception.ErrorCode;
 import com.upinmcSE.coffeeshop.exception.ErrorException;
 import com.upinmcSE.coffeeshop.repository.CustomerRepository;
@@ -145,5 +148,19 @@ public class PaymentController {
                         .phoneNumber(phone)
                         .build()))
                 .build();
+    }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<PageResponse<PaymentOrderResponse>> getAll(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok().body(paymentService.getAll(page, size));
+    }
+
+    @PostMapping("/complete")
+    public ResponseEntity<String> completePayment(@RequestParam String choice, @RequestParam String paymentId) {
+        paymentService.completePayment(choice, paymentId);
+        return ResponseEntity.ok().body("Complete payment successfully");
     }
 }

@@ -3,12 +3,15 @@ package com.upinmcSE.coffeeshop.service.impl;
 import com.upinmcSE.coffeeshop.configuration.momo.MoMoConfig;
 import com.upinmcSE.coffeeshop.configuration.vnpay.VNPAYConfig;
 import com.upinmcSE.coffeeshop.dto.request.PaymentInfo;
+import com.upinmcSE.coffeeshop.dto.response.PageResponse;
+import com.upinmcSE.coffeeshop.dto.response.PaymentOrderResponse;
 import com.upinmcSE.coffeeshop.dto.response.PaymentResponse;
 import com.upinmcSE.coffeeshop.entity.*;
 import com.upinmcSE.coffeeshop.enums.PaymentType;
 import com.upinmcSE.coffeeshop.enums.Status;
 import com.upinmcSE.coffeeshop.exception.ErrorCode;
 import com.upinmcSE.coffeeshop.exception.ErrorException;
+import com.upinmcSE.coffeeshop.mapper.PaymentMapper;
 import com.upinmcSE.coffeeshop.repository.CustomerRepository;
 import com.upinmcSE.coffeeshop.repository.MemberLVRepository;
 import com.upinmcSE.coffeeshop.repository.OrderRepository;
@@ -20,6 +23,8 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +45,7 @@ public class PaymentServiceImpl implements PaymentService {
     CacheServiceImpl cacheService;
     CustomerRepository customerRepository;
     MemberLVRepository memberLVRepository;
+    PaymentMapper paymentMapper;
 
     @Override
     public PaymentResponse createPaymentVNPAY(String customerId, HttpServletRequest request, PaymentInfo paymentInfo) {
@@ -153,6 +159,19 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setStatus(Status.CANCELLED); // Chuyển sang trạng thái CANCELLED
             paymentRepository.save(payment);
         }
+    }
+
+    @Override
+    public PageResponse<PaymentOrderResponse> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        var pageData = paymentRepository.findAll(pageable);
+        return PageResponse.<PaymentOrderResponse>builder()
+                .currentPage(page)
+                .pageSize(pageData.getSize())
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream().map(paymentMapper::toPaymentOrderResponse).toList())
+                .build();
     }
 
     @Override

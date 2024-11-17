@@ -36,23 +36,23 @@ const Navbar = () => {
 
   // Hàm kiểm tra trạng thái authentication
   const checkAuthStatus = async () => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('Token');
     if (!token) {
       setIsLoggedIn(false);
       return;
     }
     try {
-      const token = localStorage.getItem('authToken');
       const res = await introspect(token); // Gọi API để verify token
-      if(res.result.valid == true){
+      console.log("res: ", res)
+      if(res.result.valid === true){
         setIsLoggedIn(true);
       }else{
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('Token');
         setIsLoggedIn(false);
       }
     } catch (error) {
       console.error("Token invalid or expired:", error);
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('Token');
       setIsLoggedIn(false);
       setShowDropdown(false);
     }
@@ -76,7 +76,7 @@ const Navbar = () => {
     setIsLoginOpen(false); // Đóng dialog login
 
     try{
-      console.log(localStorage.getItem('authToken'))
+      console.log(localStorage.getItem('Token'))
       const res = await createOrder()
       console.log("res id: ", res)
     }catch (error) {

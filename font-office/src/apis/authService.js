@@ -1,14 +1,13 @@
 import axiosClient from "./axiosClient";
 
 const login = async (username, password) => {
-    
     try{
         const response = await axiosClient.post('/authentication/customer-login', {username, password})
         console.log("response: ", response)
         if( response.data.code == 1000 & response.data.result.authenticated){
             const token = response.data.result.token;
             console.log("token: ", token)
-            localStorage.setItem('authToken', token);
+            localStorage.setItem('Token', token);
             return {
                 success: true,
                 token: token,
@@ -43,8 +42,7 @@ const logout = async (token) => {
             throw new Error('Logout failed');
         }
 
-        // Xóa token khỏi localStorage
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('Token');
         
         return {
             success: true,
@@ -89,7 +87,7 @@ const changePassword = async (oldPassword, newPassword) => {
         console.log("oldPassword: ", oldPassword, "newPassword: ", newPassword)
         var response = await axiosClient.post('/authentication/change-password', {oldPassword, newPassword}, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+                Authorization: `Bearer ${localStorage.getItem('Token')}`,
                 'Content-Type': 'application/json',
             }
         });
@@ -103,9 +101,9 @@ const changePassword = async (oldPassword, newPassword) => {
     }
 }
 
-const introspect = async ({token}) => {
+const introspect = async (token) => {
     try{
-        var response = await axiosClient.post('/authentication/introspect', { token: `Bearer ${token}` }, {
+        var response = await axiosClient.post('/authentication/introspect', { token:token }, {
             headers: {
                 'Content-Type': 'application/json',
             }

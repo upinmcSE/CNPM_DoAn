@@ -7,7 +7,6 @@ const ForgotPasswordDialog = ({ isOpen, onClose }) => {
   const [isOpenOTP, setIsOpenOTP] = useState(false);
 
   const handleClick = async () => {
-    // Kiểm tra username trước khi gọi API
     if (!username.trim()) {
       alert('Vui lòng nhập tên tài khoản');
       return;

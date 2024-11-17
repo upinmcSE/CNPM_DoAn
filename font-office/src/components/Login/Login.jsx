@@ -37,7 +37,7 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
 
         if (response.success) {
           const { token } = response;
-          Cookies.set('authToken', token);
+          Cookies.set('Token', token);
           toast.success('Đăng nhập thành công!');
           onLoginSuccess();
           onClose();

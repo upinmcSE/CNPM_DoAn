@@ -2,7 +2,7 @@ import axiosClient from "./axiosClient";
 
 const payOrder = async (paymentMethod, paymentInfo) => {
     try{
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem("Token");
         const url = `/payment/${paymentMethod}?phone=${paymentInfo.phone}&address=${paymentInfo.address}`;
         const response = await axiosClient.get(url, {
             headers: {
@@ -20,7 +20,7 @@ const payOrder = async (paymentMethod, paymentInfo) => {
 
 const payOrderCash = async ( paymentInfo) => {
     try{
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem("Token");
         const url = `/payment/cash?phone=${paymentInfo.phone}&address=${paymentInfo.address}`;
         const response = await axiosClient.post(url, {
             headers: {

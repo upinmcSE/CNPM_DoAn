@@ -3,15 +3,15 @@ import React, { createContext, useState, useCallback } from 'react';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+    const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('authToken'));
 
     const login = useCallback((token) => {
-        localStorage.setItem('token', token);
+        localStorage.setItem('authToken', token);
         setIsLoggedIn(true);
     }, []);
 
     const logout = useCallback(() => {
-        localStorage.removeItem('token');
+        localStorage.removeItem('authToken');
         setIsLoggedIn(false);
     }, []);
 

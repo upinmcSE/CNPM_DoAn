@@ -71,7 +71,7 @@ function Appbar({ open, handleDrawerOpen }) {
     const [isLoggedIn, setIsLoggedIn] = useState(false); 
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken');
         if (token) {
             setIsLoggedIn(true); // Cập nhật trạng thái nếu token tồn tại
         }
@@ -107,7 +107,7 @@ function Appbar({ open, handleDrawerOpen }) {
             const token = userData.token; // Điều này cần kiểm tra theo cấu trúc thực tế của phản hồi
             if (token) {
                 console.log(token);
-                localStorage.setItem('token', token); // Lưu token vào localStorage
+                localStorage.setItem('authToken', token); // Lưu token vào localStorage
                 handleLoginSuccess(); // Cập nhật trạng thái đăng nhập
                 handleLoginDialogClose(); // Đóng dialog đăng nhập
             } else {
@@ -122,7 +122,7 @@ function Appbar({ open, handleDrawerOpen }) {
     const handleLogout = async () => {
         try {
             await logout(); // Gọi hàm logout từ authService
-            localStorage.removeItem('token'); // Xóa token khỏi localStorage
+            localStorage.removeItem('authToken'); // Xóa token khỏi localStorage
             setIsLoggedIn(false); // Cập nhật trạng thái đăng xuất
         } catch (error) {
             console.error('Logout failed:', error); // In ra lỗi nếu có

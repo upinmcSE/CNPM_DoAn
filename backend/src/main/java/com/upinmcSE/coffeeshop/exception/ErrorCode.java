@@ -33,6 +33,7 @@ public enum ErrorCode {
     NOT_FOUND_ORDER_LINE(3003, "Not found order line", HttpStatus.NOT_FOUND),
     NOT_FOUND_PAYMENT(3004, "Not found payment", HttpStatus.NOT_FOUND),
     NOT_MATCH_OTP(4005, "OTP not matched", HttpStatus.BAD_REQUEST),
+    NOT_FOUND_INVENTORY(4006, "Not found inventory", HttpStatus.NOT_FOUND),
 
     ;
 

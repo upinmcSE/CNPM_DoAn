@@ -6,12 +6,12 @@ export const AuthProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
 
     const login = useCallback((token) => {
-        localStorage.setItem('token', token);
+        localStorage.setItem('Token', token);
         setIsLoggedIn(true);
     }, []);
 
     const logout = useCallback(() => {
-        localStorage.removeItem('token');
+        localStorage.removeItem('Token');
         setIsLoggedIn(false);
     }, []);
 

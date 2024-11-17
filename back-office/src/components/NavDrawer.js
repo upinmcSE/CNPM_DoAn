@@ -59,7 +59,7 @@ export default function NavDrawer({open, setOpen}) {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     console.log("xx:", token)
     if (token) {
       setIsLoggedIn(true); // Cập nhật trạng thái nếu token tồn tại
@@ -140,6 +140,14 @@ export default function NavDrawer({open, setOpen}) {
                 icon={<GroupIcon />}
                 handleNavbarItemClicked={handleNavbarItemClicked}
                 selected={selectedItem.includes('Employees')}
+              />
+            </ListItem>
+            <ListItem  disablePadding>
+              <MyListItemButton
+                text={"Orders"}
+                icon={<GroupIcon />}
+                handleNavbarItemClicked={handleNavbarItemClicked}
+                selected={selectedItem.includes('Orders')}
               />
             </ListItem>
             <ListItem  disablePadding>

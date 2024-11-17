@@ -11,7 +11,7 @@ const axiosClient = axios.create({
 // Thiết lập interceptor cho Axios
 axiosClient.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('Token');
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`;
         }

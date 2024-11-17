@@ -1,5 +1,3 @@
-
-// eslint-disable-next-line no-unused-vars
 import React, { useState } from "react";
 import { changePassword } from "../../apis/authService";
 
@@ -23,7 +21,6 @@ const ChangePassword = ({ isOpen, onClose, onSubmit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try{
-        // Kiểm tra mật khẩu mới và mật khẩu nhập lại có khớp không
     if (formData.newPassword !== formData.confirmPassword) {
         setError("Mật khẩu mới và xác nhận mật khẩu không khớp.");
         return;

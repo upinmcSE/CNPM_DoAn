@@ -2,6 +2,8 @@ import React, { useState, useContext } from 'react';
 import { addProductToOrder, buyNow } from '../../apis/orderService';
 import { ToastContext } from '../../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
+
+
 const ProductDialog = ({ product, onClose, onBuy }) => {
   const [quantity, setQuantity] = useState(1);
   const { toast } = useContext(ToastContext); // Sử dụng ToastContext
@@ -32,7 +34,7 @@ const ProductDialog = ({ product, onClose, onBuy }) => {
 
 
   const handleLoginCheck = async (action, product, quantity) => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('Token');
     if (token) {
       await action(product, quantity);
     } else {

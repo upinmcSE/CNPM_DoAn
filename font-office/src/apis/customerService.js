@@ -3,7 +3,7 @@ import axiosClient from "./axiosClient";
 
 const getById = async () => {
     try{
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('Token');
         console.log("token11: ", token);
         const response = await axiosClient.get(`/customers/get`, {
             headers: {

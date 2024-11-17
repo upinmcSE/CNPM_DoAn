@@ -2,7 +2,7 @@ import axiosClient from "./axiosClient";
 
 const getCustomers = async (page=1, size = 10) => {
     try{
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken');
         const res = await axiosClient.get(`/customers/getall?page=${page}&size=${size}`, {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -17,7 +17,7 @@ const getCustomers = async (page=1, size = 10) => {
 
 const updateLevel = async (id) => {
     try{
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken');
         const res = await axiosClient.put(`/customers/update-level/${id}`, null, {
             headers: {
                 Authorization: `Bearer ${token}`

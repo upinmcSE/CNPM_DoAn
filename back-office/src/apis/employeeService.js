@@ -2,7 +2,7 @@ import axiosClient from "./axiosClient";
 
 const getEmployees = async (page=1, size = 10) => {
     try{
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken');
         const res = await axiosClient.get(`/employees/getall?page=${page}&size=${size}`, {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -18,7 +18,7 @@ const getEmployees = async (page=1, size = 10) => {
 
 const addEmployee = async (employee) => {
     try{
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken');
         console.log("data", employee);
         const res = await axiosClient.post("/employees/add", employee, {
             headers: {
@@ -36,7 +36,7 @@ const addEmployee = async (employee) => {
 
 const updateEmployee = async (id, employee) => {    
     try{
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken');
         console.log("data1", id);
         console.log("data2", employee);
         const res = await axiosClient.put(`/employees/update/${id}`, employee, {
@@ -55,7 +55,7 @@ const updateEmployee = async (id, employee) => {
 
 const deleteEmployee = async (id) => {      
     try{
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken');
         await axiosClient.delete(`/employees/delete/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`
