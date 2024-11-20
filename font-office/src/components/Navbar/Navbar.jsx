@@ -138,6 +138,14 @@ const Navbar = () => {
     setShowDropdown(false);
   };
 
+  const handleHistory = () => {
+    // Xử lý khi click vào lịch sử mua hàng
+  }
+
+  const handleHistoryClose = () => {
+    // Đóng dialog lịch sử mua hàng
+  }
+
   const handleCloseChangePassword = () => setIsPasswordDialogOpen(false); // Đóng dialog đổi mật khẩu
 
 
@@ -200,6 +208,9 @@ const Navbar = () => {
                     </button>
                     <button className="inline-block px-4 py-2" onClick={handleChangePassword}>
                       Password
+                    </button>
+                    <button className="inline-block px-4 py-2" onClick={handleHistory}>
+                      History
                     </button>
                     <button className="inline-block px-4 py-2" onClick={handleLogout}>
                       Logout

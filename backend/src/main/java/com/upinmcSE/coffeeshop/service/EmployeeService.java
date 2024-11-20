@@ -11,5 +11,6 @@ public interface EmployeeService {
     EmployeeResponse add(EmployeeRequest request);
     EmployeeResponse update(String id, EmployeeUpdateRequest request);
     PageResponse<EmployeeResponse> getAll(int page, int size);
+    void checkout(String employeeId);
     void delete(String id);
 }

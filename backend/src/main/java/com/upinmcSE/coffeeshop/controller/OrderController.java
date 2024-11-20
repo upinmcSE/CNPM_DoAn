@@ -2,7 +2,9 @@ package com.upinmcSE.coffeeshop.controller;
 
 import com.upinmcSE.coffeeshop.dto.request.OrderLineRequest;
 import com.upinmcSE.coffeeshop.dto.request.OrderRequest;
+import com.upinmcSE.coffeeshop.dto.response.HistoryResponse;
 import com.upinmcSE.coffeeshop.dto.response.OrderResponse;
+import com.upinmcSE.coffeeshop.dto.response.PageResponse;
 import com.upinmcSE.coffeeshop.entity.Customer;
 import com.upinmcSE.coffeeshop.entity.Order;
 import com.upinmcSE.coffeeshop.entity.OrderCache;
@@ -74,5 +76,14 @@ public class OrderController {
                 () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
         orderService.removeOrderLineFromOrder(customer.getId(), orderId, orderLineId);
         return ResponseEntity.ok("OrderLine đã được xóa khỏi Order.");
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<PageResponse<HistoryResponse>> getHistory(@RequestParam(defaultValue = "1") int page,
+                                                                    @RequestParam(defaultValue = "10") int size) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Customer customer = customerRepository.findByUsername(username).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+        return ResponseEntity.ok().body(orderService.getHistory(customer.getId(), page, size));
     }
 }

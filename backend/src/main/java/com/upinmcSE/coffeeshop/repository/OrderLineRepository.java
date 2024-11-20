@@ -1,5 +1,6 @@
 package com.upinmcSE.coffeeshop.repository;
 
+import com.upinmcSE.coffeeshop.entity.Order;
 import com.upinmcSE.coffeeshop.entity.OrderLine;
 import com.upinmcSE.coffeeshop.entity.Product;
 import org.springframework.data.domain.Page;

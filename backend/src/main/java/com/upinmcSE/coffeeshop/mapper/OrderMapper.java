@@ -1,11 +1,9 @@
 package com.upinmcSE.coffeeshop.mapper;
 
+import com.upinmcSE.coffeeshop.dto.response.HistoryResponse;
 import com.upinmcSE.coffeeshop.dto.response.OrderLineResponse;
 import com.upinmcSE.coffeeshop.dto.response.OrderResponse;
-import com.upinmcSE.coffeeshop.entity.Customer;
-import com.upinmcSE.coffeeshop.entity.Order;
-import com.upinmcSE.coffeeshop.entity.OrderCache;
-import com.upinmcSE.coffeeshop.entity.OrderLine;
+import com.upinmcSE.coffeeshop.entity.*;
 import com.upinmcSE.coffeeshop.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -50,6 +48,19 @@ public class OrderMapper {
                 .id(orderLine.getId())
                 .productName(orderLine.getProduct().getName())
                 .amount(orderLine.getAmount())
+                .build();
+    }
+
+    public HistoryResponse toHistoryResponse(Order order, Payment payment){
+        return HistoryResponse.builder()
+                .id(order.getId())
+                .orderLines(order.getOrderLines().stream()
+                        .map(this::toOrderLineResponse)
+                        .collect(Collectors.toList()))
+                .totalPrice(order.getTotalPrice())
+                .status(payment.getStatus())
+                .createdDate(order.getCreatedDate())
+                .modifiedDate(order.getModifiedDate())
                 .build();
     }
 }

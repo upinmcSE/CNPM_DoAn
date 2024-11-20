@@ -105,6 +105,14 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
     }
 
+    @Override
+    public void checkout(String employeeId) {
+        var employee = employeeRepository.findById(employeeId).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_EMPLOYEE));
+        employee.setWorkingDays(employee.getWorkingDays() + 1);
+        employeeRepository.saveAndFlush(employee);
+    }
+
     @Transactional
     @Override
     public void delete(String id) {

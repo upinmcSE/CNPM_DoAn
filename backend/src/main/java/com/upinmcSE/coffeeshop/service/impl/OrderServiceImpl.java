@@ -2,7 +2,7 @@ package com.upinmcSE.coffeeshop.service.impl;
 
 import com.upinmcSE.coffeeshop.dto.request.OrderLineRequest;
 import com.upinmcSE.coffeeshop.dto.request.OrderRequest;
-import com.upinmcSE.coffeeshop.dto.response.OrderResponse;
+import com.upinmcSE.coffeeshop.dto.response.*;
 import com.upinmcSE.coffeeshop.entity.*;
 import com.upinmcSE.coffeeshop.exception.ErrorCode;
 import com.upinmcSE.coffeeshop.exception.ErrorException;
@@ -13,6 +13,8 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,7 @@ public class OrderServiceImpl implements OrderService {
     CustomerRepository customerRepository;
     CacheServiceImpl cacheService;
     ProductRepository productRepository;
+    PaymentRepository paymentRepository;
 
     @Transactional
     @Override
@@ -139,6 +142,46 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderResponse> getAllByDay(LocalDate day) {
         return List.of();
+    }
+
+    @Override
+    public PageResponse<HistoryResponse> getHistory(String customerId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        var data = orderRepository.findAllByCustomerId(customerId, pageable);
+
+        if (data.isEmpty()) {
+            throw new ErrorException(ErrorCode.NOT_FOUND_ORDER);
+        }
+        List<HistoryResponse> historyResponses = new ArrayList<>();
+        for (Order order : data) {
+            // Lấy status từ Payment
+            var payment = paymentRepository.findByOrderId(order.getId())
+                    .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_PAYMENT));
+
+            HistoryResponse historyResponse = new HistoryResponse(
+                    order.getId(),
+                    order.getOrderLines().stream()
+                            .map(orderLine -> new OrderLineResponse(
+                                    orderLine.getId(),
+                                    orderLine.getProduct().getName(),
+                                    orderLine.getAmount()))
+                            .toList(),
+                    order.getTotalPrice(),
+                    payment.getStatus(),
+                    order.getCreatedDate(),
+                    order.getModifiedDate()
+            );
+
+            historyResponses.add(historyResponse);
+        }
+
+        return PageResponse.<HistoryResponse>builder()
+                .currentPage(page)
+                .pageSize(data.getSize())
+                .totalPages(data.getTotalPages())
+                .totalElements(data.getTotalElements())
+                .data(historyResponses)
+                .build();
     }
 
     @Transactional
