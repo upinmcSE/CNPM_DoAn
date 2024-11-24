@@ -57,21 +57,23 @@ const logout = async (token) => {
     }
 };
 
-const register = async (username, password, rePassword) => {
+const register = async (username, email, password, rePassword) => {
+    console.log("username: ", username, "email: ", email, "password: ", password, "rePassword: ", rePassword)
     try {
-        const response = await axiosClient.post('/customers/add', { username, password, rePassword });
+        const response = await axiosClient.post('/customers/add', { username, email, password, rePassword });
 
-        if (response.data.code === 1000) { // Kiểm tra mã phản hồi
-            return {
-                success: true,
-                message: response.data.message || "Đăng ký thành công"
-            };
-        } else {
-            return {
-                success: false,
-                message: response.data.message || "Đăng ký thất bại"
-            };
-        }
+        // if (response.data.code === 1000) { // Kiểm tra mã phản hồi
+        //     return {
+        //         success: true,
+        //         message: response.data.message || "Đăng ký thành công"
+        //     };
+        // } else {
+        //     return {
+        //         success: false,
+        //         message: response.data.message || "Đăng ký thất bại"
+        //     };
+        // }
+        return response
     } catch (error) {
         console.error("Register error:", error);
         return {

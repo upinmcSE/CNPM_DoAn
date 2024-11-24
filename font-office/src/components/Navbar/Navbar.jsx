@@ -8,6 +8,7 @@ import Profile from "../Profile/Profile";
 import ChangePassword from "../ChangePassword/ChangePassword";
 import { createOrder, getCart } from "../../apis/orderService";
 import { introspect, logout } from "../../apis/authService";
+import HistoryList from "../History/History";
 
 const Menu = [
   { id: 1, name: "Home", link: "/#" },
@@ -24,7 +25,89 @@ const Navbar = () => {
   const [isCartDialogOpen, setIsCartDialogOpen] = useState(false); 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [isHistoryDialogOpen, setHistoryDialogOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+
+  // Mock API data
+  const orders = [
+    {
+      id: "06460235-caff-445e-9d54-8618355d59fe",
+      orderLines: [
+        { id: "4cf0baa3-6ac2-4681-aa6f-813248c210cb", productName: "Cappuccino", amount: 1 },
+      ],
+      totalPrice: 40000,
+      status: "COMPLETED",
+      createdDate: "2024-11-13",
+      modifiedDate: "2024-11-13",
+    },
+    {
+      id: "3e38a930-edb7-417b-a4b1-3b1ac48c076e",
+      orderLines: [
+        { id: "050c8bc6-6a1b-4c20-aa81-f42bc7d5b127", productName: "Cà Phê Nóng", amount: 3 },
+        { id: "b0105ba8-4630-437a-b4ab-89bf9e3b5f7a", productName: "Cappuccino", amount: 2 },
+      ],
+      totalPrice: 200000,
+      status: "COMPLETED",
+      createdDate: "2024-11-13",
+      modifiedDate: "2024-11-13",
+    },
+    {
+      id: "3e38a930-edb7-417b-a4b1-3b1ac48c076e",
+      orderLines: [
+        { id: "050c8bc6-6a1b-4c20-aa81-f42bc7d5b127", productName: "Cà Phê Nóng", amount: 3 },
+        { id: "b0105ba8-4630-437a-b4ab-89bf9e3b5f7a", productName: "Cappuccino", amount: 2 },
+      ],
+      totalPrice: 200000,
+      status: "COMPLETED",
+      createdDate: "2024-11-13",
+      modifiedDate: "2024-11-13",
+    },
+    {
+      id: "3e38a930-edb7-417b-a4b1-3b1ac48c076e",
+      orderLines: [
+        { id: "050c8bc6-6a1b-4c20-aa81-f42bc7d5b127", productName: "Cà Phê Nóng", amount: 3 },
+        { id: "b0105ba8-4630-437a-b4ab-89bf9e3b5f7a", productName: "Cappuccino", amount: 2 },
+      ],
+      totalPrice: 200000,
+      status: "COMPLETED",
+      createdDate: "2024-11-13",
+      modifiedDate: "2024-11-13",
+    },
+    {
+      id: "3e38a930-edb7-417b-a4b1-3b1ac48c076e",
+      orderLines: [
+        { id: "050c8bc6-6a1b-4c20-aa81-f42bc7d5b127", productName: "Cà Phê Nóng", amount: 3 },
+        { id: "b0105ba8-4630-437a-b4ab-89bf9e3b5f7a", productName: "Cappuccino", amount: 2 },
+      ],
+      totalPrice: 200000,
+      status: "COMPLETED",
+      createdDate: "2024-11-13",
+      modifiedDate: "2024-11-13",
+    },
+    {
+      id: "3e38a930-edb7-417b-a4b1-3b1ac48c076e",
+      orderLines: [
+        { id: "050c8bc6-6a1b-4c20-aa81-f42bc7d5b127", productName: "Cà Phê Nóng", amount: 3 },
+        { id: "b0105ba8-4630-437a-b4ab-89bf9e3b5f7a", productName: "Cappuccino", amount: 2 },
+      ],
+      totalPrice: 200000,
+      status: "COMPLETED",
+      createdDate: "2024-11-13",
+      modifiedDate: "2024-11-13",
+    },
+    {
+      id: "3e38a930-edb7-417b-a4b1-3b1ac48c076e",
+      orderLines: [
+        { id: "050c8bc6-6a1b-4c20-aa81-f42bc7d5b127", productName: "Cà Phê Nóng", amount: 3 },
+        { id: "b0105ba8-4630-437a-b4ab-89bf9e3b5f7a", productName: "Cappuccino", amount: 2 },
+      ],
+      totalPrice: 200000,
+      status: "COMPLETED",
+      createdDate: "2024-11-13",
+      modifiedDate: "2024-11-13",
+    },
+      
+  ];
 
   useEffect(() => {
     checkAuthStatus();
@@ -139,11 +222,11 @@ const Navbar = () => {
   };
 
   const handleHistory = () => {
-    // Xử lý khi click vào lịch sử mua hàng
+    setHistoryDialogOpen(true)
   }
 
   const handleHistoryClose = () => {
-    // Đóng dialog lịch sử mua hàng
+    setHistoryDialogOpen(false);
   }
 
   const handleCloseChangePassword = () => setIsPasswordDialogOpen(false); // Đóng dialog đổi mật khẩu
@@ -263,6 +346,11 @@ const Navbar = () => {
         isOpen={isLoginOpen}
         onClose={() => setIsLoginOpen(false)}
         onLoginSuccess={handleLoginSuccess}
+      />
+      <HistoryList
+        isOpen={isHistoryDialogOpen}
+        onClose={handleHistoryClose}
+        orders={orders}
       />
     </div>
   );

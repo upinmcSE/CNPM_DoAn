@@ -1,8 +1,8 @@
 import React, {useState, useEffect } from 'react';
 import { removeItemFromOrder, getCart } from '../../apis/orderService';
 import { useNavigate } from 'react-router-dom';
+
 const ProductListDialog = ({ cartItems, onClose}) => {
-  console.log("cartItems: ", cartItems);
   const [Items, setItems] = useState(cartItems);
   const navigate = useNavigate();
 

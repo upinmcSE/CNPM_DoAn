@@ -10,6 +10,7 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
   const { toast } = useContext(ToastContext);
   const [isLoading, setIsLoading] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [isOpenForgotPassword, setIsOpenForgotPassword] = useState(false);
 
   const handleForgotPassword = () => {
@@ -60,7 +61,7 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
       repassword: '',
     },
     validationSchema: Yup.object({
-      username: Yup.string().required('Username là bắt buộc'),
+      username: Yup.string().required('Số điện thoại là bắt buộc'),
       email: Yup.string().email('Email không hợp lệ').required('Email là bắt buộc'),
       password: Yup.string()
         .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
@@ -74,10 +75,10 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
       setIsLoading(true);
 
       try {
-        const { username, email, password } = values;
-        const response = await register(username, email, password);
-
-        if (response.success) {
+        const { username, email, password, repassword } = values;
+        const response = await register(username, email, password, repassword);
+        console.log(response);
+        if (response.data.code === 1000) {
           toast.success('Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.');
           setIsRegister(false);
           formikLogin.resetForm();
@@ -111,12 +112,83 @@ const Login = ({ isOpen, onClose, onLoginSuccess }) => {
           {isRegister ? (
             <>
               {/* Register fields */}
+              <div className="mb-4">
+                <label className="block mb-1 text-gray-700" htmlFor="usernameRegister">
+                  Số Điện Thoại
+                </label>
+                <input
+                  id="usernameRegister"
+                  type="text"
+                  {...formikRegister.getFieldProps('username')}
+                  className={`border border-gray-300 rounded w-full px-3 py-2 text-black ${
+                    formikRegister.touched.username && formikRegister.errors.username ? 'border-red-500' : ''
+                  }`}
+                  required
+                />
+                {formikRegister.touched.username && formikRegister.errors.username && (
+                  <p className="text-red-500 text-sm mt-1">{formikRegister.errors.username}</p>
+                )}
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-1 text-gray-700" htmlFor="emailRegister">
+                  Email
+                </label>
+                <input
+                  id="emailRegister"
+                  type="email"
+                  {...formikRegister.getFieldProps('email')}
+                  className={`border border-gray-300 rounded w-full px-3 py-2 text-black ${
+                    formikRegister.touched.email && formikRegister.errors.email ? 'border-red-500' : ''
+                  }`}
+                  required
+                />
+                {formikRegister.touched.email && formikRegister.errors.email && (
+                  <p className="text-red-500 text-sm mt-1">{formikRegister.errors.email}</p>
+                )}
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-1 text-gray-700" htmlFor="passwordRegister">
+                  Mật Khẩu
+                </label>
+                <input
+                  id="passwordRegister"
+                  type="password"
+                  {...formikRegister.getFieldProps('password')}
+                  className={`border border-gray-300 rounded w-full px-3 py-2 text-black ${
+                    formikRegister.touched.password && formikRegister.errors.password ? 'border-red-500' : ''
+                  }`}
+                  required
+                />
+                {formikRegister.touched.password && formikRegister.errors.password && (
+                  <p className="text-red-500 text-sm mt-1">{formikRegister.errors.password}</p>
+                )}
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-1 text-gray-700" htmlFor="repasswordRegister">
+                  Nhập Lại Mật Khẩu
+                </label>
+                <input
+                  id="repasswordRegister"
+                  type="password"
+                  {...formikRegister.getFieldProps('repassword')}
+                  className={`border border-gray-300 rounded w-full px-3 py-2 text-black ${
+                    formikRegister.touched.repassword && formikRegister.errors.repassword ? 'border-red-500' : ''
+                  }`}
+                  required
+                />
+                {formikRegister.touched.repassword && formikRegister.errors.repassword && (
+                  <p className="text-red-500 text-sm mt-1">{formikRegister.errors.repassword}</p>
+                )}
+              </div>
             </>
           ) : (
             <>
               <div className="mb-4">
                 <label className="block mb-1 text-gray-700" htmlFor="usernameLogin">
-                  Tên Người Dùng
+                  Số điện thoại
                 </label>
                 <input
                   id="usernameLogin"

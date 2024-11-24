@@ -96,4 +96,22 @@ const removeItemFromOrder = async (orderId, orderLineId) => {
     }
 }
 
-export { createOrder, addProductToOrder, removeItemFromOrder, getCart, buyNow }
+const getHistoryList = async (page, size) => {
+    try {
+        const token = localStorage.getItem('Token');
+        const response = await axiosClient.get(`/orders/getHistory?page=${page}&size=${size}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            }
+        });
+
+        console.log(response); 
+        return response; 
+    } catch (error) {
+        console.error('Error fetching order lines:', error);
+        return []; // Trả về một mảng rỗng trong trường hợp có lỗi
+    }
+}
+
+export { createOrder, addProductToOrder, removeItemFromOrder, getCart, buyNow, getHistoryList }

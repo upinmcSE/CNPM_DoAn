@@ -4,6 +4,7 @@ import com.upinmcSE.coffeeshop.dto.request.CustomerRequest;
 import com.upinmcSE.coffeeshop.dto.response.CustomerResponse;
 import com.upinmcSE.coffeeshop.dto.response.PageResponse;
 import com.upinmcSE.coffeeshop.dto.response.ProductResponse;
+import com.upinmcSE.coffeeshop.dto.response.SuccessResponse;
 import com.upinmcSE.coffeeshop.service.impl.CustomerServiceImpl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +20,11 @@ public class CustomerController {
     CustomerServiceImpl customerService;
 
     @PostMapping("/add")
-    public ResponseEntity<CustomerResponse> add(@RequestBody CustomerRequest request){
-        return ResponseEntity.ok().body(customerService.add(request));
+    public SuccessResponse<CustomerResponse> add(@RequestBody CustomerRequest request){
+        System.out.println(request.password()+ "|" + request.rePassword());
+        return SuccessResponse.<CustomerResponse>builder()
+                .result(customerService.add(request))
+                .build();
     }
 
     @GetMapping("/getall")
