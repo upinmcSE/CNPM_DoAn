@@ -1,101 +1,96 @@
 import pandas as pd
 import numpy as np
+import requests
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
-import random
 from flask import Flask, request, jsonify
 
-# Bước 1: Tạo dữ liệu giả
-random.seed(42)  # Để tạo dữ liệu có thể tái tạo
-customers = [f'{i:05d}' for i in range(1, 101)]  # 100 khách hàng
-products = [f'{i * 1000}' for i in range(1, 21)]  # 20 sản phẩm: 1000, 2000, ..., 20000
-
-data = {
-    'customers': [],
-    'products': [],
-    'amount': [],
-    'date': []
-}
-for _ in range(500):
-    customer_id = random.choice(customers)
-    product_id = random.choice(products)
-    amount = random.randint(1, 5)  # Số lượng ngẫu nhiên từ 1 đến 5
-    date = f"2024-09-{random.randint(10, 30):02d}"  # Ngày ngẫu nhiên trong tháng 09/2024
-    
-    data['customers'].append(customer_id)
-    data['products'].append(product_id)
-    data['amount'].append(amount)
-    data['date'].append(date)
-
-# Tạo DataFrame từ dữ liệu giả
-df = pd.DataFrame(data)
-
-print(df.head())
-
-
-# Bước 2: Tiền xử lý dữ liệu
-# Chuyển đổi ngày tháng thành kiểu dữ liệu ngày
-df['date'] = pd.to_datetime(df['date'])
-
-
-# Tạo một DataFrame để nhóm theo sản phẩm
-product_data = df.groupby('products').agg({
-    'amount': 'sum',
-    'date': 'max'  # Lấy ngày lớn nhất cho mỗi sản phẩm
-}).reset_index()
-
-
-# Tính toán ma trận TF-IDF cho các sản phẩm
-tfidf = TfidfVectorizer()
-tfidf_matrix = tfidf.fit_transform(df['products'])
-
-# Tính toán độ tương đồng cosine
-cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
-
-# Hàm gợi ý sản phẩm cho từng khách hàng
-def get_recommendations(customer_id, num_recommendations=9):
-    # Lấy danh sách sản phẩm đã mua của khách hàng
-    purchased_products = df[df['customers'] == customer_id]['products'].unique()
-    
-    recommendations = set()
-    
-    # Lấy gợi ý dựa trên các sản phẩm đã mua
-    for product_id in purchased_products:
-        # Kiểm tra xem sản phẩm có trong ma trận không
-        if product_id in tfidf.get_feature_names_out():  
-            idx = np.where(tfidf.get_feature_names_out() == product_id)[0][0]
-            
-            # Lấy độ tương đồng với các sản phẩm khác
-            sim_scores = list(enumerate(cosine_sim[idx]))
-            
-            # Sắp xếp sản phẩm theo độ tương đồng
-            sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-            
-            # Thêm sản phẩm gợi ý vào tập hợp, bỏ qua sản phẩm đã mua
-            for i in sim_scores[1:]:
-                if i[0] < len(tfidf.get_feature_names_out()):  # Kiểm tra chỉ số hợp lệ
-                    recommendations.add(tfidf.get_feature_names_out()[i[0]])
-                if len(recommendations) >= num_recommendations:
-                    break
-
-    return list(recommendations)
-
-
+api_url = "http://localhost:8081/coffee/api/v1/orders/order-orderline"
 
 # Khởi tạo ứng dụng Flask
 app = Flask(__name__)
 
+def get_recommendations(customer_id, df, num_recommendations=3):
+    # Lọc các sản phẩm mà khách hàng đã mua
+    purchased_products = df[df['customerId'] == customer_id]
+
+    print("Sản phẩm đã mua: ",purchased_products.head())
+
+    # Tạo ma trận TF-IDF cho các sản phẩm, với trọng số từ 'amount'
+    tfidf = TfidfVectorizer()
+
+    # Tạo một bản sao độc lập của DataFrame
+    df = df.copy()
+
+    df.loc[:, 'product_description'] = df.apply(
+    lambda row: str(row['productId']) + ' ' + ' '.join([str(row['amount'])] * row['amount']), axis=1)
+    
+    tfidf_matrix = tfidf.fit_transform(df['product_description'])
+
+    print("ma trận: ",tfidf_matrix)
+    
+    # Tính toán độ tương đồng cosine
+    cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+
+    print("Độ tương đồng",cosine_sim)
+    
+    # Lấy gợi ý từ các sản phẩm đã mua
+    recommendations = set()
+
+    for _, row in purchased_products.iterrows():
+        product_id = row['productId']
+        
+        # Tìm chỉ số của sản phẩm trong ma trận TF-IDF
+        idx = df[df['productId'] == product_id].index[0]
+        
+        # Tính độ tương đồng với các sản phẩm khác
+        sim_scores = list(enumerate(cosine_sim[idx]))
+        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+        
+        # Thêm sản phẩm vào danh sách gợi ý (trừ sản phẩm đã mua)
+        for i in sim_scores[1:]:
+            similar_product_id = df.iloc[i[0]]['productId']
+            if similar_product_id not in purchased_products['productId'].values:
+                print("hhihi",similar_product_id)
+                recommendations.add(similar_product_id)
+            
+            if len(recommendations) >= num_recommendations:
+                break
+    
+    return list(recommendations)
+
+
 # Tạo endpoint cho API
 @app.route('/recommendations', methods=['GET'])
 def recommendations():
-    customer_id = request.args.get('customerId')  # Lấy customerId từ query params
+    customer_id = request.args.get('customerId')
+    token = request.args.get('token')
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
     if customer_id is None:
         return jsonify({'error': 'customerId is required'}), 400
+    
+    # Lấy dữ liệu từ API
+    response = requests.get(api_url, headers=headers)
 
-    # Lấy gợi ý sản phẩm cho customerId
-    product_recommendations = get_recommendations(customer_id)
-    print(f"Recommendations for customer {customer_id}: {recommendations}")
-    return jsonify({'customerId': customer_id, 'recommendations': product_recommendations})
+    if response.status_code == 200:
+        data = response.json()
+
+        # Chuyển đổi dữ liệu thành DataFrame
+        df = pd.DataFrame(data)
+        
+        # Chỉ giữ lại ba cột: customerId, productId, amount
+        df_filtered = df[['customerId', 'productId', 'amount']]
+        
+        print(df_filtered.head())
+        # Lấy gợi ý sản phẩm cho customerId
+        product_recommendations = get_recommendations(customer_id, df_filtered)
+        
+        return jsonify({'customerId': customer_id, 'recommendations': product_recommendations})
+    else:
+        return jsonify({'error': 'Failed to retrieve data from the backend API'}), 500
+
 
 # Chạy ứng dụng Flask
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getById } from "../../apis/customerService";
+import { getById, update } from "../../apis/customerService";
 
 const Profile = ({ isOpen, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
@@ -23,7 +23,7 @@ const Profile = ({ isOpen, onClose, onUpdate }) => {
         console.log("data111: ", data.point);
         setFormData({
           fullName: data.fullName || "",
-          gender: data.gender ? (data.gender ? "male" : "female") : "",
+          gender: data.gender === true ? "male" : "female",
           age: data.age || "",
           email: data.email || "",
           memberLevel: data.menberLV || "",  
@@ -47,9 +47,20 @@ const Profile = ({ isOpen, onClose, onUpdate }) => {
     }));
   };
 
-  const handleUpdate = () => {
-    onUpdate(formData);
-    onClose();
+  const handleUpdate = async () => {
+    const updateRequest = {
+      ...formData,
+      gender: formData.gender === "male",
+    };
+  
+    try {
+      const res = await update(updateRequest);
+      console.log(res) // Gọi API cập nhật
+      onUpdate(updateRequest);
+      onClose();
+    } catch (err) {
+      console.error("Cập nhật thất bại:", err);
+    }
   };
 
   if (!isOpen) return null;
@@ -88,7 +99,6 @@ const Profile = ({ isOpen, onClose, onUpdate }) => {
                 <option value="">Chọn giới tính</option>
                 <option value="male">Nam</option>
                 <option value="female">Nữ</option>
-                <option value="other">Khác</option>
               </select>
             </div>
 

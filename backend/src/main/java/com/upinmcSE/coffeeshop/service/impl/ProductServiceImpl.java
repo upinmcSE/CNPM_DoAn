@@ -1,5 +1,7 @@
 package com.upinmcSE.coffeeshop.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.upinmcSE.coffeeshop.dto.request.ProductRequest;
 import com.upinmcSE.coffeeshop.dto.response.PageResponse;
 import com.upinmcSE.coffeeshop.dto.response.ProductResponse;
@@ -19,10 +21,15 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +40,7 @@ public class ProductServiceImpl implements ProductService {
     ProductMapper productMapper;
     ProductImageRepository productImageRepository;
     OrderLineRepository orderLineRepository;
+    RestTemplate restTemplate;
     FileUtil fileUtil;
 
 
@@ -148,9 +156,57 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
+    @Transactional
     @Override
-    public ProductResponse getRecommemdProduct(String customerId) {
-        return null;
+    public PageResponse<ProductResponse> getRecommemdProduct(String customerId, String token) {
+        String url = "http://127.0.0.1:5000/recommendations";
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("customerId", customerId)
+                .queryParam("token", token);
+
+        // Gọi API và lấy kết quả dưới dạng String
+        String result = restTemplate.getForObject(uriBuilder.toUriString(), String.class);
+        System.out.println("result: " + result);
+
+
+        List<ProductResponse> products = new ArrayList<>();
+
+        try {
+            // Sử dụng ObjectMapper để chuyển đổi chuỗi JSON thành JsonNode
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(result);
+
+            // Truy xuất trực tiếp từ JSON
+            JsonNode recommendationsNode = rootNode.path("recommendations");
+            if (recommendationsNode.isArray()) {
+                // Lặp qua tất cả các sản phẩm trong mảng recommendations
+                for (JsonNode recommendation : recommendationsNode) {
+                    String productId = recommendation.asText();  // Lấy mã sản phẩm từ từng phần tử
+                    System.out.println("Recommended product: " + productId);
+
+                    // Lấy sản phẩm từ repository
+                    Product productEntity = productRepository.findById(productId)
+                            .orElseThrow(() -> new ErrorException(ErrorCode.NOT_FOUND_PRODUCT));
+
+                    // Chuyển đổi thành ProductResponse và thêm vào danh sách
+                    products.add(productMapper.toProductResponse(productEntity));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        int totalElements = products.size();
+        int totalPages = (totalElements > 0) ? 1 : 0;
+
+        return PageResponse.<ProductResponse>builder()
+                .currentPage(1)
+                .pageSize(totalElements)
+                .totalPages(totalPages)
+                .totalElements(totalElements)
+                .data(products)
+                .build();
     }
 
     @Transactional

@@ -18,7 +18,7 @@ public interface ProductService {
 
     PageResponse<ProductResponse> getProducts(int page, int size);
     PageResponse<ProductResponse> getCategoryProduct(int page, int size, String category);
-    ProductResponse getRecommemdProduct(String customerId);
+    PageResponse<ProductResponse> getRecommemdProduct(String customerId, String token);
     
     void delete(String id);
 

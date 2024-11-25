@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Img2 from "../../assets/coffee2.png";
 import ProductDialog from "../ProductDialog/ProductDialog";
-import { getProductOutstanding } from "../../apis/productService";
+import { getProductOutstanding, getProductRecommend } from "../../apis/productService";
 
 const ServicesData = [
   {
@@ -10,7 +10,8 @@ const ServicesData = [
     name: "Espresso",
     description:
       "Lorem ipsum dolor sit amet ipsum dolor sit ametipsum dolor sit amet ipsum dolor sit amet.",
-    aosDelay: "100",
+    price: "100",
+    category: "COFFEE",
   },
   {
     id: 2,
@@ -18,7 +19,8 @@ const ServicesData = [
     name: "Americano",
     description:
       "Lorem ipsum dolor sit amet ipsum dolor sit ametipsum dolor sit amet ipsum dolor sit amet",
-    aosDelay: "300",
+    price: "300",
+    category: "COFFEE",
   },
   {
     id: 3,
@@ -26,29 +28,39 @@ const ServicesData = [
     name: "Cappuccino",
     description:
       "Lorem ipsum dolor sit amet ipsum dolor sit ametipsum dolor sit amet ipsum dolor sit amet",
-    aosDelay: "500",
+    price: "500",
+    category: "COFFEE",
   },
 ];
-
-
-
 
 const Services = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [outstandingProducts, setOutstandingProducts] = useState([]);
+  const [recommendProducts, setRecomendProducts] = useState([]);
 
   useEffect(() => {
     loadProducts();
-  },[1]);
+  }, []);
 
   const loadProducts = async () => {
     try {
+      // Load các sản phẩm nổi bật mà không cần kiểm tra đăng nhập
       const res = await getProductOutstanding();
-      console.log("res-outstanding: ", res.totalElements)
       if (res && res.data) {
         setOutstandingProducts(res.data);
       } else {
         console.warn("No data returned from API");
+      }
+
+      // Kiểm tra token để gọi API sản phẩm đề xuất nếu người dùng đã đăng nhập
+      const token = localStorage.getItem("Token");
+
+      if (token) {
+        const recommendedRes = await getProductRecommend();
+        console.log("recommendedRes: ", recommendedRes);
+        if (recommendedRes && recommendedRes.result) {
+          setRecomendProducts(recommendedRes.result.data);
+        }
       }
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -76,29 +88,50 @@ const Services = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-14 md:gap-5 place-items-center">
-            {ServicesData.map((service) => (
-              <div
-                key={service.id}
-                data-aos="fade-up"
-                data-aos-delay={service.aosDelay}
-                className="rounded-2xl bg-white hover:bg-primary hover:text-white relative shadow-xl duration-high group max-w-[300px]"
-                onClick={() => handleProductClick(service)} // Thêm sự kiện click
-              >
-                <div className="h-[122px]">
+            {recommendProducts.length > 0
+              ? recommendProducts.map((service) => (
+                <div
+                  key={service.id}  
+                  className="flex flex-col justify-between w-64 h-80 rounded-2xl bg-white border border-gray-300 p-4 shadow hover:shadow-lg transition-shadow duration-300 group relative cursor-pointer"
+                  onClick={() => handleProductClick(service)}  
+                  data-aos-delay="100"
+                >
                   <img
-                    src={service.img}
+                    src={`http://localhost:8081/coffee/api/v1/products/images/${service.urlImage}`}  
+                    alt={service.name}  
+                    className="w-full h-40 object-cover mb-2 rounded-lg"
+                  />
+                  <h3 className="font-semibold text-lg text-center group-hover:text-primary">
+                    {service.name}  
+                  </h3>
+                  <p className="text-gray-500 text-center">{service.description}</p>
+                  <p className="text-gray-500 text-center group-hover:text-white transition-colors duration-300">
+                    {service.price} VNĐ  
+                  </p>
+                </div>
+              ))
+              : ServicesData.map((service) => (
+                <div
+                  key={service.id}  
+                  className="flex flex-col justify-between w-64 h-80 rounded-2xl bg-white border border-gray-300 p-4 shadow hover:shadow-lg transition-shadow duration-300 group relative cursor-pointer"
+                  onClick={() => handleProductClick(service)}  
+                  data-aos="fade-up"
+                  data-aos-delay="100"
+                >
+                  <img
+                    src={Img2}
                     alt=""
                     className="max-w-[200px] block mx-auto transform -translate-y-14 group-hover:scale-105 group-hover:rotate-6 duration-300"
                   />
-                </div>
-                <div className="p-4 text-center">
-                  <h1 className="text-xl font-bold">{service.name}</h1>
-                  <p className="text-gray-500 group-hover:text-white duration-high text-sm line-clamp-2">
-                    {service.description}
+                  <h3 className="font-semibold text-lg text-center group-hover:text-primary">
+                    {service.name}  
+                  </h3>
+                  <p className="text-gray-500 text-center">{service.description}</p>
+                  <p className="text-gray-500 text-center group-hover:text-white transition-colors duration-300">
+                    {service.price} VNĐ  
                   </p>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </div>
@@ -113,7 +146,7 @@ const Services = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-14 md:gap-5 place-items-center">
-          {outstandingProducts.map((product) => (
+            {outstandingProducts.map((product) => (
               <div
                 key={product.id}
                 className="flex flex-col justify-between w-64 h-80 rounded-2xl bg-white border border-gray-300 p-4 shadow hover:shadow-lg transition-shadow duration-300 group relative cursor-pointer"
@@ -121,10 +154,18 @@ const Services = () => {
                 data-aos="fade-up"
                 data-aos-delay="100"
               >
-                <img src={`http://localhost:8081/coffee/api/v1/products/images/${product.urlImage}`} alt={product.name} className="w-full h-40 object-cover mb-2 rounded-lg" />
-                <h3 className="font-semibold text-lg text-center group-hover:text-primary">{product.name}</h3>
+                <img
+                  src={`http://localhost:8081/coffee/api/v1/products/images/${product.urlImage}`}
+                  alt={product.name}
+                  className="w-full h-40 object-cover mb-2 rounded-lg"
+                />
+                <h3 className="font-semibold text-lg text-center group-hover:text-primary">
+                  {product.name}
+                </h3>
                 <p className="text-gray-500 text-center">{product.description}</p>
-                <p className="text-gray-500 text-center group-hover:text-white transition-colors duration-300">{product.price} VNĐ</p>
+                <p className="text-gray-500 text-center group-hover:text-white transition-colors duration-300">
+                  {product.price} VNĐ
+                </p>
               </div>
             ))}
           </div>
@@ -138,6 +179,5 @@ const Services = () => {
     </>
   );
 };
-
 
 export default Services;

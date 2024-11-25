@@ -99,7 +99,7 @@ const removeItemFromOrder = async (orderId, orderLineId) => {
 const getHistoryList = async (page, size) => {
     try {
         const token = localStorage.getItem('Token');
-        const response = await axiosClient.get(`/orders/getHistory?page=${page}&size=${size}`, {
+        const response = await axiosClient.get(`/orders/history?page=${page}&size=${size}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',

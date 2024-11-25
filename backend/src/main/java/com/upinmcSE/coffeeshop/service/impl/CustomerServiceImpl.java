@@ -1,6 +1,7 @@
 package com.upinmcSE.coffeeshop.service.impl;
 
 import com.upinmcSE.coffeeshop.dto.request.CustomerRequest;
+import com.upinmcSE.coffeeshop.dto.request.CustomerUpdateRequest;
 import com.upinmcSE.coffeeshop.dto.response.CustomerResponse;
 import com.upinmcSE.coffeeshop.dto.response.PageResponse;
 import com.upinmcSE.coffeeshop.dto.response.ProductResponse;
@@ -64,17 +65,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Transactional
     @Override
-    public CustomerResponse update(String id, CustomerRequest request) {
-        return null;
-    }
-
-    @Transactional
-    @Override
-    public CustomerResponse updateLevel(String id) {
-        Customer customer = customerRepository.findById(id).orElseThrow(
-                () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
-        MemberLv memberLV = memberLVRepository.findByName("VIP");
-        customer.setMemberLv(memberLV);
+    public CustomerResponse update(CustomerUpdateRequest request, Customer customer) {
+        customer.setFullName(request.fullName());
+        customer.setGender(request.gender());
+        customer.setAge(request.age());
+        customer.setEmail(request.email());
         customer = customerRepository.saveAndFlush(customer);
         return customerMapper.toCustomerResponse(customer);
     }

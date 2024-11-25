@@ -19,5 +19,22 @@ const getById = async () => {
     }
 }
 
+const update = async (data) => {
+    try{
+        const token = localStorage.getItem('Token');
+        const response = await axiosClient.put(`/customers/update`, data, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        console.log("response: ", response.data)
+        return response.data;
 
-export {getById}
+    }catch(error){
+        console.error("Error updating customer: ", error);
+        throw error
+    }
+}
+
+
+export {getById, update}

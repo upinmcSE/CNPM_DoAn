@@ -24,5 +24,22 @@ const getProductOutstanding = async () => {
     }
 }
 
+const getProductRecommend = async () => {
+    try{
+        const token = localStorage.getItem("Token");
+        const res = await axiosClient.get(`/products/recommend?token=${token}`, 
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        console.log("res111: ", res);
+        return res.data;
+    }catch(error){
+        console.error("Error fetching recommend products: ", error);
+        throw error;
+    }
+}
 
-export {getProductCategory, getProductOutstanding}
+
+export {getProductCategory, getProductOutstanding, getProductRecommend}

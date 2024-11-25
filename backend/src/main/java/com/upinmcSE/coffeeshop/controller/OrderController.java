@@ -3,6 +3,7 @@ package com.upinmcSE.coffeeshop.controller;
 import com.upinmcSE.coffeeshop.dto.request.OrderLineRequest;
 import com.upinmcSE.coffeeshop.dto.request.OrderRequest;
 import com.upinmcSE.coffeeshop.dto.response.HistoryResponse;
+import com.upinmcSE.coffeeshop.dto.response.OrderOrderlineResponse;
 import com.upinmcSE.coffeeshop.dto.response.OrderResponse;
 import com.upinmcSE.coffeeshop.dto.response.PageResponse;
 import com.upinmcSE.coffeeshop.entity.Customer;
@@ -12,6 +13,7 @@ import com.upinmcSE.coffeeshop.entity.OrderLine;
 import com.upinmcSE.coffeeshop.exception.ErrorCode;
 import com.upinmcSE.coffeeshop.exception.ErrorException;
 import com.upinmcSE.coffeeshop.repository.CustomerRepository;
+import com.upinmcSE.coffeeshop.repository.OrderRepository;
 import com.upinmcSE.coffeeshop.service.impl.CacheServiceImpl;
 import com.upinmcSE.coffeeshop.service.impl.OrderServiceImpl;
 import lombok.AccessLevel;
@@ -21,6 +23,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/orders")
@@ -29,6 +34,7 @@ public class OrderController {
     OrderServiceImpl orderService;
     CacheServiceImpl cacheService;
     CustomerRepository customerRepository;
+    OrderRepository orderRepository;
 
     // Khởi tạo order
     @PostMapping("/create")
@@ -80,10 +86,29 @@ public class OrderController {
 
     @GetMapping("/history")
     public ResponseEntity<PageResponse<HistoryResponse>> getHistory(@RequestParam(defaultValue = "1") int page,
-                                                                    @RequestParam(defaultValue = "10") int size) {
+                                                                    @RequestParam(defaultValue = "4") int size) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Customer customer = customerRepository.findByUsername(username).orElseThrow(
                 () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
         return ResponseEntity.ok().body(orderService.getHistory(customer.getId(), page, size));
+    }
+
+    @GetMapping("/order-orderline")
+    public ResponseEntity<List<OrderOrderlineResponse>> getOrderAndOrderLines() {
+        List<Object[]> result = orderRepository.findOrderAndOrderLines();
+
+        List<OrderOrderlineResponse> orderLineDTOs = new ArrayList<>();
+        for (Object[] row : result) {
+            OrderOrderlineResponse dto = new OrderOrderlineResponse();
+            dto.setOrderId((String) row[0]);
+            dto.setCustomerId((String) row[1]);
+            dto.setTotalPrice((Double) row[2]);
+            dto.setOrderLineId((String) row[3]);
+            dto.setProductId((String) row[4]);
+            dto.setAmount((Integer) row[5]);
+            orderLineDTOs.add(dto);
+        }
+
+        return ResponseEntity.ok(orderLineDTOs);
     }
 }

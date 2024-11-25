@@ -4,3 +4,4 @@ tensorflow
 tensorflow-recommenders
 flask 
 import-ipynb
+requests

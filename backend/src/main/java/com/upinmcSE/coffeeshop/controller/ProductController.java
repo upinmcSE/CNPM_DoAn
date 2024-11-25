@@ -6,6 +6,10 @@ import com.upinmcSE.coffeeshop.dto.response.PageResponse;
 import com.upinmcSE.coffeeshop.dto.response.ProductResponse;
 import com.upinmcSE.coffeeshop.dto.response.RecommendationResponse;
 import com.upinmcSE.coffeeshop.dto.response.SuccessResponse;
+import com.upinmcSE.coffeeshop.entity.Customer;
+import com.upinmcSE.coffeeshop.exception.ErrorCode;
+import com.upinmcSE.coffeeshop.exception.ErrorException;
+import com.upinmcSE.coffeeshop.repository.CustomerRepository;
 import com.upinmcSE.coffeeshop.service.impl.ProductServiceImpl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +20,11 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -29,7 +35,7 @@ import java.nio.file.Paths;
 @RequestMapping("/api/v1/products")
 public class ProductController {
     private final ProductServiceImpl productService;
-    private final RestTemplate restTemplate;
+    private final CustomerRepository customerRepository;
 
     @Value("${http.client.recommend}")
     String RECOMMENDATION_SERVICE_URL;
@@ -74,16 +80,13 @@ public class ProductController {
     }
 
     @GetMapping("/recommend")
-    public ResponseEntity<RecommendationResponse> getRecommendations(@RequestBody RecommendationRequest request) {
-        String url = RECOMMENDATION_SERVICE_URL + "?customerId=" + request.customerId();
-
-        ResponseEntity<RecommendationResponse> response = restTemplate.getForEntity(url, RecommendationResponse.class);
-
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return ResponseEntity.ok(response.getBody());
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
+    public SuccessResponse<PageResponse<ProductResponse>> getRecommendations(@RequestParam String token) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Customer customer = customerRepository.findByUsername(username).orElseThrow(
+                () -> new ErrorException(ErrorCode.NOT_FOUND_CUSTOMER));
+        return SuccessResponse.<PageResponse<ProductResponse>>builder()
+                .result(productService.getRecommemdProduct(customer.getId(), token))
+                .build();
     }
 
     @GetMapping("/images/{imageName}")
