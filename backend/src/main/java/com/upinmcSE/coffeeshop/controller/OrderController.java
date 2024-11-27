@@ -108,7 +108,11 @@ public class OrderController {
             dto.setAmount((Integer) row[5]);
             orderLineDTOs.add(dto);
         }
-
         return ResponseEntity.ok(orderLineDTOs);
+    }
+
+    @GetMapping("total-revenue")
+    public ResponseEntity<Double> getTotalRevenue() {
+        return ResponseEntity.ok(orderService.calculateTotalRevenueForCurrentMonth());
     }
 }

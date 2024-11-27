@@ -56,7 +56,8 @@ const updateEmployee = async (id, employee) => {
 const deleteEmployee = async (id) => {      
     try{
         const token = localStorage.getItem('authToken');
-        await axiosClient.delete(`/employees/delete/${id}`, {
+        await axiosClient.delete(`/employees/delete/${id}`,{}, 
+            {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -69,4 +70,23 @@ const deleteEmployee = async (id) => {
     }
 }
 
-export { getEmployees, addEmployee, updateEmployee, deleteEmployee }
+const checkin = async () => {      
+    try {
+        const token = localStorage.getItem('authToken');
+        await axiosClient.put(
+            `/employees/checkin`, 
+            {},{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        console.log("Checkin successfully: ");
+        alert("Checkin successfully");
+    } catch (error) {
+        console.error("Error checking in: ", error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
+export { getEmployees, addEmployee, updateEmployee, deleteEmployee, checkin }

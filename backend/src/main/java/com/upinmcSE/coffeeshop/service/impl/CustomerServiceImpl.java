@@ -99,6 +99,11 @@ public class CustomerServiceImpl implements CustomerService {
         return customerMapper.toCustomerResponse(customer);
     }
 
+    @Override
+    public long countCustomerThisMonth() {
+        return customerRepository.countCustomersCreatedThisMonth();
+    }
+
     @Transactional
     @Override
     public void delete(String id) {

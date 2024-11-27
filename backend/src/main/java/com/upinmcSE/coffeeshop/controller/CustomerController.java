@@ -60,4 +60,9 @@ public class CustomerController {
     public ResponseEntity<CustomerResponse> getById(){
         return ResponseEntity.ok().body(customerService.getById());
     }
+
+    @GetMapping("customer-this-month")
+    public ResponseEntity<Long> getCustomerThisMonth(){
+        return ResponseEntity.ok().body(customerService.countCustomerThisMonth());
+    }
 }

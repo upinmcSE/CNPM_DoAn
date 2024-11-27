@@ -17,6 +17,7 @@ public interface OrderService {
     void removeOrderLineFromOrder(String customerId, String orderId, String orderLineId);
     List<OrderResponse> getAllByDay(LocalDate day);
     PageResponse<HistoryResponse> getHistory(String customerId, int page, int size);
+    Double calculateTotalRevenueForCurrentMonth();
     List<OrderResponse> getAllByMonth(LocalDate month);
     List<OrderResponse> getAllByYear(LocalDate year);
 }

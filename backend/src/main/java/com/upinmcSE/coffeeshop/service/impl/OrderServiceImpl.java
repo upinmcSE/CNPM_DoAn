@@ -185,6 +185,11 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
+    @Override
+    public Double calculateTotalRevenueForCurrentMonth() {
+        return orderRepository.calculateTotalRevenueForCurrentMonth();
+    }
+
     @Transactional
     @Override
     public List<OrderResponse> getAllByMonth(LocalDate month) {

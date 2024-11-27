@@ -63,7 +63,6 @@ function Customers() {
                             <TableCell>Age</TableCell>
                             <TableCell>Point</TableCell>
                             <TableCell>Level</TableCell>
-                            <TableCell>Action</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -75,11 +74,11 @@ function Customers() {
                                 <TableCell>{c.age}</TableCell>
                                 <TableCell>{c.point}</TableCell>
                                 <TableCell>{c.menberLV}</TableCell>
-                                <TableCell>
+                                {/* <TableCell>
                                     <IconButton onClick={() => handleUpdateLevel(c)}>
                                         <ArrowUpwardIcon  />
                                     </IconButton>
-                                </TableCell>
+                                </TableCell> */}
                             </TableRow>
                         )}
                     </TableBody>

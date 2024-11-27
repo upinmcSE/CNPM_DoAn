@@ -18,4 +18,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
             "FROM Order o " +
             "JOIN o.orderLines ol")
     List<Object[]> findOrderAndOrderLines();
+
+    @Query("SELECT SUM(o.totalPrice) FROM Order o WHERE MONTH(o.createdDate) = MONTH(CURRENT_DATE) AND YEAR(o.createdDate) = YEAR(CURRENT_DATE)")
+    Double calculateTotalRevenueForCurrentMonth();
 }

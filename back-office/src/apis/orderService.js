@@ -34,4 +34,18 @@ const completedOrder = async (paymentId) => {
     }
 };
 
-export { getOrder, completedOrder }
+const totalRevenue = async () => {
+    try {
+        const token = localStorage.getItem('authToken');
+        const res = await axiosClient.get(`/orders/total-revenue`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return res;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export { getOrder, completedOrder, totalRevenue }

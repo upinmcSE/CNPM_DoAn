@@ -13,5 +13,6 @@ public interface CustomerService {
     CustomerResponse update(CustomerUpdateRequest request, Customer customer);
     PageResponse<CustomerResponse> getAll(int page, int size);
     CustomerResponse getById();
+    long countCustomerThisMonth();
     void delete(String id);
 }

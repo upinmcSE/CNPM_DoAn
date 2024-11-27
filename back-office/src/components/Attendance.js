@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Typography, Paper, Alert } from '@mui/material';
-
+import { checkin } from '../apis/employeeService';
 const Attendance = () => {
     const [isCheckedIn, setIsCheckedIn] = useState(false);
     const [message, setMessage] = useState('');
@@ -19,12 +19,16 @@ const Attendance = () => {
         }
     }, []);
 
-    const handleCheckIn = () => {
-        setIsCheckedIn(true);
-        setMessage('Check-in successful!');
-
-        // Lưu thông tin ghi nhận vào localStorage với timestamp hiện tại
-        localStorage.setItem('checkInStatus', JSON.stringify({ timestamp: new Date().getTime() }));
+    const handleCheckIn = async () => {
+        try{
+            setIsCheckedIn(true);
+            const res = await checkin();
+            setMessage("Check-in successful!");
+            localStorage.setItem('checkInStatus', JSON.stringify({ timestamp: new Date().getTime() }));
+        }catch(error){
+            console.error("Error checking in: ", error.response ? error.response.data : error.message);
+            throw error;
+        }
     };
 
     return (

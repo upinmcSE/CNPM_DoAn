@@ -106,7 +106,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void checkout(String employeeId) {
+    public void checkin(String employeeId) {
         var employee = employeeRepository.findById(employeeId).orElseThrow(
                 () -> new ErrorException(ErrorCode.NOT_FOUND_EMPLOYEE));
         employee.setWorkingDays(employee.getWorkingDays() + 1);

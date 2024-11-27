@@ -46,12 +46,12 @@ public class EmployeeController {
         return ResponseEntity.ok().body(employeeService.update(id, request));
     }
 
-    @PutMapping("/checkout")
+    @PutMapping("/checkin")
     public ResponseEntity<String> checkout(){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Employee employee = employeeRepository.findByUsername(username).orElseThrow(
                 () -> new ErrorException(ErrorCode.NOT_FOUND_EMPLOYEE));
-        employeeService.checkout(employee.getId());
+        employeeService.checkin(employee.getId());
         return ResponseEntity.ok("Employees have been checked out.");
     }
 }

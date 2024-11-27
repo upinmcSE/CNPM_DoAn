@@ -31,4 +31,19 @@ const updateLevel = async (id) => {
     }
 }
 
-export { getCustomers, updateLevel };
+const countCustomers = async () => {
+    try{
+        const token = localStorage.getItem('authToken');
+        const res = await axiosClient.get(`/customers/customer-this-month`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return res;
+    }catch(error){
+        console.error("Error count customers: ", error);
+        throw error;
+    }
+}
+
+export { getCustomers, updateLevel, countCustomers };
